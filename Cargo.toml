@@ -1,0 +1,13 @@
+[package]
+name = "loekchipz"
+version = "0.0.1"
+#
+# TODO: Add Patrik
+#
+authors = ["Martin Törnqvist m.tornq@gmail.com"]
+
+[dependencies]
+#
+# TODO: Enable dependency
+#
+# sdl2 = "0.10.0"
