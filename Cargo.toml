@@ -1,10 +1,8 @@
 [package]
 name = "loekchipz"
 version = "0.0.1"
-#
-# TODO: Add Patrik
-#
-authors = ["Martin Törnqvist m.tornq@gmail.com"]
-
+authors = ["Martin Törnqvist m.tornq@gmail.com",
+	   "Patrik Thorell   p.str1989@gmail.com"]
+	   
 [dependencies]
 sdl2 = "0.10.0"
