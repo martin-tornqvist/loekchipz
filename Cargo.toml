@@ -5,4 +5,4 @@ authors = ["Martin Törnqvist m.tornq@gmail.com",
 	   "Patrik Thorell   p.str1989@gmail.com"]
 	   
 [dependencies]
-sdl2 = "0.10.0"
+sdl2 = "0.30"
