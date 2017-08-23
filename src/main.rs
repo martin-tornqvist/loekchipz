@@ -3,6 +3,10 @@ extern crate sdl2;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
+mod geometry;
+
+use geometry::P;
+
 pub fn main()
 {
     let sdl_context = sdl2::init().unwrap();
@@ -11,8 +15,12 @@ pub fn main()
         .video()
         .unwrap();
 
+    let title = "Loekchipz 0.0.1";
+
+    let dims = P { x: 800, y: 600 };
+
     let window = video_subsystem
-        .window("Loekchipz 0.0.1", 800, 600)
+        .window(title, dims.x as u32, dims.y as u32)
         .position_centered()
         .opengl()
         .build()
