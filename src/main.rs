@@ -9,6 +9,7 @@ use states::State;
 use states::StateFinished;
 use states::States;
 use std::time::Duration;
+use sdl2::rect::Point;
 
 // -----------------------------------------------------------------------------
 // *** T E M P O R A R Y   D U M M Y   S T A T E ***
@@ -77,6 +78,9 @@ pub fn main()
     let w = 800;
     let h = 600;
 
+    let point_a = Point::new(40, 10);
+    let point_b = Point::new(400, 300);
+
     let window = video_subsystem
         .window(title, w, h)
         .position_centered()
@@ -109,6 +113,8 @@ pub fn main()
         canvas.clear();
 
         states.draw();
+
+        canvas.draw_line(point_a, point_b);
 
         canvas.present();
 
