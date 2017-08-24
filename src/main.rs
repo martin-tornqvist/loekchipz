@@ -10,11 +10,14 @@ use states::StateFinished;
 use states::States;
 use std::time::Duration;
 use sdl2::rect::Point;
+use sdl2::rect::Rect;
+use sdl2::pixels::PixelFormatEnum;
 
 // -----------------------------------------------------------------------------
 // *** T E M P O R A R Y   D U M M Y   S T A T E ***
 // -----------------------------------------------------------------------------
 struct MainMenuState {}
+
 
 impl State for MainMenuState
 {
@@ -89,10 +92,25 @@ pub fn main()
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
+    let texture_creator = canvas.texture_creator();
+    let mut tex0 = texture_creator.create_texture_streaming(
+        PixelFormatEnum::RGB24, 32, 64).unwrap();
+    tex0.with_lock(None, |buffer: &mut [u8], pitch: usize| {
+        for y in 0..64 {
+            for x in 0..32 {
+                let offset = y * pitch + 3 * x;
+                buffer[offset + 0] = (13 * x) as u8;
+                buffer[offset + 1] = (37 * y) as u8;
+                buffer[offset + 2] = 0;
+            }
+        }
+    }).unwrap();
 
     let mut states = States::new();
 
     states.push(Box::new(MainMenuState {}));
+
+    let mut t = 35.0f64;
 
     'state_loop: loop
     {
@@ -114,7 +132,13 @@ pub fn main()
 
         states.draw();
 
-        canvas.draw_line(point_a, point_b);
+        canvas.copy(&tex0, None, Some(Rect::new(100, 50, 32, 64))).unwrap();
+        let moving_x = 133.7 * (0.01 * t).cos();
+        canvas.copy_ex(&tex0, None, Some(Rect::new((500.0 + moving_x) as i32, 100, 32, 64)), 35.0, None, false, false).unwrap();
+        t = t + 1.0;
+        canvas.copy_ex(&tex0, None, Some(Rect::new(500, 300, 4 * 32, 4 * 64)), t, None, false, false).unwrap();
+        canvas.draw_line(point_a, point_b).unwrap();
+
 
         canvas.present();
 
