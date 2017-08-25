@@ -2,6 +2,7 @@ extern crate sdl2;
 
 mod geometry;
 mod states;
+mod entity;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -9,6 +10,8 @@ use states::State;
 use states::StateFinished;
 use states::States;
 use std::time::Duration;
+use entity::Entity;
+use geometry::P;
 
 // -----------------------------------------------------------------------------
 // *** T E M P O R A R Y   D U M M Y   S T A T E ***
@@ -73,10 +76,13 @@ pub fn main()
     let video_subsystem = sdl_context.video().unwrap();
 
     let title = "Loekchipz 0.0.1";
-
+    
+    let e = Entity::new(P{ x:10 , y:10 }, "loek".to_string(), true);
+    
     let w = 800;
     let h = 600;
 
+    
     let window = video_subsystem
         .window(title, w, h)
         .position_centered()
