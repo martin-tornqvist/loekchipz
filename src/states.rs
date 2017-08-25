@@ -11,7 +11,7 @@ pub trait State
 
     fn on_start(&mut self) -> StateFinished;
 
-    fn draw(&mut self);
+    fn draw(&mut self, texture: &sdl2::render::Texture, canvas: &mut sdl2::render::WindowCanvas);
 
     // TODO: Don't pass SDL stuff here, find a better way to read user input
     fn update(&mut self, sdl_context: &sdl2::Sdl) -> StateFinished;
@@ -93,13 +93,13 @@ impl States
     }
 
     #[allow(dead_code)]
-    pub fn draw(&mut self)
+    pub fn draw(&mut self, texture: &sdl2::render::Texture, canvas: &mut sdl2::render::WindowCanvas)
     {
         // TODO: We might want to enable drawing states on top of other states,
         //       if so, add a parameter such as "draw_overlayed" for the states,
         //       and iterate backwards over the state vector here, until (and
         //       including) the first state which shall NOT be drawn overlayed.
-        self.top().state.draw();
+        self.top().state.draw(texture, canvas);
     }
 
     // TODO: Don't pass SDL stuff here, find a better way to read user input

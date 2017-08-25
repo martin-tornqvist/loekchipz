@@ -3,18 +3,16 @@ use geometry::P;
 #[allow(dead_code)]
 pub struct Entity{
     
-    pos: P,
-    name: String,
-    is_blocking: bool
+    pub pos: P,
+    pub is_blocking: bool
         
 }
 
 impl Entity {
 
-    pub fn new(pos: P, name: String, is_blocking: bool) -> Entity {
+    pub fn new(pos: P, is_blocking: bool) -> Entity {
         Entity {
             pos: pos,
-            name: name,
             is_blocking: is_blocking,
         }
     }
@@ -24,4 +22,5 @@ impl Entity {
         self.pos.x += dx;
         self.pos.y += dy;
     }
+    
 }

@@ -3,7 +3,12 @@ extern crate sdl2;
 mod geometry;
 mod states;
 mod entity;
+mod gamestate;
+mod map;
 
+use map::Map;
+use std::path::Path;
+use gamestate::GameState;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use states::State;
@@ -34,7 +39,7 @@ impl State for MainMenuState
         return StateFinished::No;
     }
 
-    fn draw(&mut self)
+    fn draw(&mut self, texture: &sdl2::render::Texture, canvas: &mut sdl2::render::WindowCanvas)
     {
         println!("MainMenuState: draw()");
     }
@@ -77,8 +82,6 @@ pub fn main()
 
     let title = "Loekchipz 0.0.1";
     
-    let e = Entity::new(P{ x:10 , y:10 }, "loek".to_string(), true);
-    
     let w = 800;
     let h = 600;
 
@@ -92,9 +95,13 @@ pub fn main()
 
     let mut canvas = window.into_canvas().build().unwrap();
 
+    let texture_creator = canvas.texture_creator();
+    let temp_surface = sdl2::surface::Surface::load_bmp(Path::new("gfx/tile_sheet.bmp")).unwrap();
+    let texture = texture_creator.create_texture_from_surface(&temp_surface).unwrap();
+    
     let mut states = States::new();
-
-    states.push(Box::new(MainMenuState {}));
+    
+    states.push(Box::new(GameState {m :Map::new()}));
 
     'state_loop: loop
     {
@@ -114,8 +121,8 @@ pub fn main()
 
         canvas.clear();
 
-        states.draw();
-
+        states.draw(&texture, &mut canvas);
+        
         canvas.present();
 
         // TODO: Don't pass SDL stuff here, find a better way to read user input
