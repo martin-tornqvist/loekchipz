@@ -4,16 +4,18 @@ use geometry::P;
 pub struct Entity{
     
     pub pos: P,
-    pub is_blocking: bool
+    pub is_blocking: bool,
+    pub tiletype: i32
         
 }
 
 impl Entity {
 
-    pub fn new(pos: P, is_blocking: bool) -> Entity {
+    pub fn new(pos: P, is_blocking: bool, tiletype: i32) -> Entity {
         Entity {
             pos: pos,
             is_blocking: is_blocking,
+            tiletype: tiletype,
         }
     }
     

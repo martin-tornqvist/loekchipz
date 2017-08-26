@@ -5,14 +5,10 @@ use entity::Entity;
 use sdl2::rect::Rect;
 use sdl2::sys::SDL_Texture;
 use sdl2::render::Canvas;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 
-// This is fucking ridiculous... Seriously? Can't I just have a const "value"?
-const MAP_WIDTH_U32:  u32 = 50;
-const MAP_HEIGHT_U32: u32 = 50;
-const MAP_WIDTH_I32:  i32 = 50;
-const MAP_HEIGHT_I32: i32 = 50;
-const TILE_SIZE_U32:  u32 = 16;
-const TILE_SIZE_I32:  i32 = 16;
+const TILE_SIZE:  i32 = 16;
 
 pub struct Map {
 
@@ -28,24 +24,55 @@ impl Map {
     
     fn init_map(map: &mut Vec<Entity>) {
         
-        for _y in 0..MAP_HEIGHT_I32 {
-            for _x in 0..MAP_WIDTH_I32 {
-                let p: P = P{x: _x, y: _y};
-                map.push(Entity::new(p, false));
-                
+        /*for _y in 0..MAP_HEIGHT_I32 {
+        for _x in 0..MAP_WIDTH_I32 {
+
+        map.push(Entity::new(P{x: _x, y: _y}, false, 0));
+        
+    }
+    }*/
+
+        let mut f = BufReader::new(File::open("data/map").unwrap());
+
+        let mut s = String::new();
+        f.read_line(&mut s).unwrap();
+
+        for(_y, line) in f.lines().enumerate() {
+
+            for(_x, number) in line.unwrap().split(char::is_whitespace).enumerate() {
+                let new_x: i32 = _x as i32;
+                let new_y: i32 = _y as i32;
+                map.push(Entity::new(P{x: new_x, y: new_y}, false, number.trim().parse().unwrap()));
             }
+            
         }
         
     }
-
+    
     pub fn render_map(&mut self, sdl_texture: &sdl2::render::Texture, sdl_context: &mut sdl2::render::WindowCanvas){
-        let mut src = Rect::new(0, 0, TILE_SIZE_U32, TILE_SIZE_U32);
-        let mut dst = Rect::new(0, 0, TILE_SIZE_U32, TILE_SIZE_U32);
+        let mut src = Rect::new(0, 0, TILE_SIZE as u32, TILE_SIZE as u32);
+        let mut dst = Rect::new(0, 0, TILE_SIZE as u32, TILE_SIZE as u32);
 
         for i in &self.map {
-            let temp_p: P = i.pos;
-            dst.x = temp_p.x*TILE_SIZE_I32;
-            dst.y = temp_p.y*TILE_SIZE_I32;
+            let dst_p: P = i.pos;
+            let tiletype: i32 = i.tiletype;
+            dst.x = dst_p.x*TILE_SIZE as i32;
+            dst.y = dst_p.y*TILE_SIZE as i32;
+
+            // TODO: Enums?
+            
+            if(tiletype == 0){
+                src.x = 0*TILE_SIZE as i32;
+                src.y = 0*TILE_SIZE as i32;
+            }
+            else if(tiletype == 1){
+                src.x = 1*TILE_SIZE as i32;
+                src.y = 0*TILE_SIZE as i32;
+            }
+            else if(tiletype == 2){
+                src.x = 2*TILE_SIZE as i32;
+                src.y = 0*TILE_SIZE as i32;
+            }
             
             sdl_context.copy(sdl_texture, Some(src), Some(dst)).unwrap();
             
