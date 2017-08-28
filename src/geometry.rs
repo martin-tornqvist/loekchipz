@@ -2,6 +2,23 @@ use std::ops::Add;
 use std::ops::Sub;
 
 // -----------------------------------------------------------------------------
+// Conversions between 1d and 2d representations
+// -----------------------------------------------------------------------------
+pub fn vec_idx(pos2d: &P, width: i32) -> usize
+{
+    let idx = width * pos2d.y + pos2d.x;
+
+    return idx as usize;
+}
+
+pub fn vec_size(dims: &P) -> usize
+{
+    let size = dims.x * dims.y;
+
+    return size as usize;
+}
+
+// -----------------------------------------------------------------------------
 // Direction
 // -----------------------------------------------------------------------------
 #[allow(dead_code)]
@@ -180,6 +197,19 @@ impl Sub for P
     }
 }
 
+// A nice array to iterate over in algorithms
+pub const OFFSETS: [P; 9] = [
+    P { x: -1, y: -1 },
+    P { x: 0, y: -1 },
+    P { x: 1, y: -1 },
+    P { x: -1, y: 0 },
+    P { x: 0, y: 0 },
+    P { x: 1, y: 0 },
+    P { x: -1, y: 1 },
+    P { x: 0, y: 1 },
+    P { x: 1, y: 1 },
+];
+
 // -----------------------------------------------------------------------------
 // Rectangle
 // -----------------------------------------------------------------------------
@@ -206,6 +236,17 @@ impl PartialEq for R
     fn eq(&self, other: &R) -> bool
     {
         self.p0 == other.p0 && self.p1 == other.p1
+    }
+}
+
+impl R
+{
+    fn is_p_inside(&self, p: &P) -> bool
+    {
+        let x_inside = (p.x >= self.p0.x) && (p.x <= self.p1.x);
+        let y_inside = (p.y >= self.p0.y) && (p.y <= self.p1.y);
+
+        return x_inside && y_inside;
     }
 }
 
