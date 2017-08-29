@@ -1,7 +1,10 @@
+#![feature(vec_resize_default)]
+
 extern crate sdl2;
 
 mod geometry;
 mod states;
+mod floodfill;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
