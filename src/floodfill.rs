@@ -149,11 +149,6 @@ mod tests {
     #[test]
     fn test_flood()
     {
-        // p0: P,
-        // p1: Option<P>,
-        // blocked: &A2<bool>,
-        // travel_lmt: Option<i32>,
-
         let p0 = P { x: 50, y: 75 };
 
         let dims = P { x: 512, y: 256 };
