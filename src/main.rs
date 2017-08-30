@@ -17,6 +17,7 @@ use std::path::Path;
 use gamestate::GameState;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::pixels::Color;
 use states::State;
 use states::StateFinished;
 use states::States;
@@ -102,7 +103,8 @@ pub fn main()
     let mut canvas = window.into_canvas().build().unwrap();
 
     let texture_creator = canvas.texture_creator();
-    let temp_surface = sdl2::surface::Surface::load_bmp(Path::new("gfx/tile_sheet.bmp")).unwrap();
+    let mut temp_surface = sdl2::surface::Surface::load_bmp(Path::new("gfx/tile_sheet.bmp")).unwrap();
+    temp_surface.set_color_key(true, Color::RGB(0xff, 0x00, 0xff));
     let texture = texture_creator.create_texture_from_surface(&temp_surface).unwrap();
     
     let mut states = States::new();

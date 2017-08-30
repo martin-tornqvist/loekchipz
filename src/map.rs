@@ -72,6 +72,29 @@ impl Map {
             }
             
         }
+
+
+        // TODO: Remove...
+        map.at(10, 10).push(Entity::new( P{x: 10, y: 10},
+                                         false,
+                                         3,
+                                         "obviously a goldnugget, duh".to_string()));
+
+        map.at(14, 11).push(Entity::new( P{x: 14, y: 11},
+                                         false,
+                                         3,
+                                         "obviously a goldnugget, duh".to_string()));
+        
+        map.at(10, 10).push(Entity::new( P{x: 10, y: 10},
+                                         false,
+                                         2,
+                                         "aim".to_string()));
+        
+ 
+
+        
+        
+        
         
         return map;
         
@@ -107,6 +130,10 @@ impl Map {
                     }
                     else if tiletype == 2 {
                         src.x = 2*TILE_SIZE as i32;
+                        src.y = 0*TILE_SIZE as i32;
+                    }
+                    else if tiletype == 3 {
+                        src.x = 3*TILE_SIZE as i32;
                         src.y = 0*TILE_SIZE as i32;
                     }
                     
