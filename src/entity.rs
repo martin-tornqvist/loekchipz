@@ -1,28 +1,42 @@
 use geometry::P;
+use geometry::Dir;
 
 #[allow(dead_code)]
 pub struct Entity{
     
-    pub pos: P,
-    pub is_blocking: bool,
-    pub tiletype: i32
+    pos: P,
+    is_blocking: bool,
+    tiletype: i32,
+    name: String,
         
 }
 
 impl Entity {
 
-    pub fn new(pos: P, is_blocking: bool, tiletype: i32) -> Entity {
+    pub fn new(pos: P, is_blocking: bool, tiletype: i32, name: String) -> Entity {
         Entity {
             pos: pos,
             is_blocking: is_blocking,
             tiletype: tiletype,
+            name: name,
         }
     }
     
     
-    pub fn move_pos(&mut self, dx: i32, dy:i32) {
-        self.pos.x += dx;
-        self.pos.y += dy;
+    pub fn move_pos(&mut self, p: P) {
+        self.pos = p;
+    }
+
+    pub fn move_dir(&mut self, d: Dir){
+        // ...
+    }
+
+    pub fn get_pos(&self) -> P {
+        return self.pos;
+    }
+
+    pub fn get_tile_type(&self) -> i32 {
+        return self.tiletype;
     }
     
 }

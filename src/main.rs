@@ -1,10 +1,16 @@
+#![feature(vec_resize_default)]
+
 extern crate sdl2;
 
 mod geometry;
 mod states;
+
 mod entity;
 mod gamestate;
 mod map;
+
+mod floodfill;
+
 
 use map::Map;
 use std::path::Path;

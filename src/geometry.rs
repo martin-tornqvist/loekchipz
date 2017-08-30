@@ -2,6 +2,33 @@ use std::ops::Add;
 use std::ops::Sub;
 
 // -----------------------------------------------------------------------------
+// Conversions between 1d and 2d representations
+// -----------------------------------------------------------------------------
+#[allow(dead_code)]
+pub fn vec_idx(x: i32, y: i32, width: i32) -> usize
+{
+    let idx = width * y + x;
+
+    return idx as usize;
+}
+
+#[allow(dead_code)]
+pub fn vec_idx_p(pos2d: P, width: i32) -> usize
+{
+    let idx = width * pos2d.y + pos2d.x;
+
+    return idx as usize;
+}
+
+#[allow(dead_code)]
+pub fn vec_size(dims: P) -> usize
+{
+    let size = dims.x * dims.y;
+
+    return size as usize;
+}
+
+// -----------------------------------------------------------------------------
 // Direction
 // -----------------------------------------------------------------------------
 #[allow(dead_code)]
@@ -70,7 +97,7 @@ pub fn sign(value: i32) -> i32
 }
 
 // -----------------------------------------------------------------------------
-// Position
+// Position/dimensions
 // -----------------------------------------------------------------------------
 #[derive(Copy)]
 pub struct P
@@ -91,7 +118,7 @@ impl P
     }
 
     #[allow(dead_code)]
-    fn offset_p(&self, p: &Self) -> P
+    fn offset_p(&self, p: Self) -> P
     {
         P {
             x: self.x + p.x,
@@ -180,6 +207,29 @@ impl Sub for P
     }
 }
 
+// A nice array to iterate over in algorithms
+//
+// Each index corresponds to a direction:
+//
+// 0 1 2
+//  \|/
+// 3-4-5
+//  /|\
+// 6 7 8
+//
+#[allow(dead_code)]
+pub const OFFSETS: [P; 9] = [
+    P { x: -1, y: -1 },
+    P { x: 0, y: -1 },
+    P { x: 1, y: -1 },
+    P { x: -1, y: 0 },
+    P { x: 0, y: 0 },
+    P { x: 1, y: 0 },
+    P { x: -1, y: 1 },
+    P { x: 0, y: 1 },
+    P { x: 1, y: 1 },
+];
+
 // -----------------------------------------------------------------------------
 // Rectangle
 // -----------------------------------------------------------------------------
@@ -209,9 +259,146 @@ impl PartialEq for R
     }
 }
 
+impl R
+{
+    #[allow(dead_code)]
+    pub fn is_p_inside(&self, p: P) -> bool
+    {
+        let x_inside = (p.x >= self.p0.x) && (p.x <= self.p1.x);
+        let y_inside = (p.y >= self.p0.y) && (p.y <= self.p1.y);
+
+        return x_inside && y_inside;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Dynamic 2d array
+// -----------------------------------------------------------------------------
+pub struct A2<T>
+{
+    pub data: Vec<T>,
+    w: i32,
+    h: i32,
+}
+
+impl<T> A2<T>
+{
+    #[allow(dead_code)]
+    pub fn w(&self) -> i32
+    {
+        return self.w;
+    }
+
+    #[allow(dead_code)]
+    pub fn h(&self) -> i32
+    {
+        return self.h;
+    }
+
+    #[allow(dead_code)]
+    pub fn dims(&self) -> P
+    {
+        return P {
+            x: self.w,
+            y: self.h,
+        };
+    }
+
+    #[allow(dead_code)]
+    pub fn size(&self) -> usize
+    {
+        return (self.w * self.h) as usize;
+    }
+
+    #[allow(dead_code)]
+    pub fn at(&mut self, x: i32, y: i32) -> &mut T
+    {
+        let i = self.vec_idx(x, y);
+
+        return &mut self.data[i];
+    }
+
+    #[allow(dead_code)]
+    pub fn at_p(&mut self, p: P) -> &mut T
+    {
+        let mut v = self.at(p.x, p.y);
+
+        return v;
+    }
+
+    #[allow(dead_code)]
+    fn vec_idx(&self, x: i32, y: i32) -> usize
+    {
+        return vec_idx(x, y, self.w);
+    }
+}
+
+impl<T: Copy> A2<T>
+{
+    #[allow(dead_code)]
+    pub fn new_copied(dims: P, new_element: T) -> A2<T>
+    {
+        A2 {
+            data: vec![new_element; (dims.x * dims.y) as usize],
+            w: dims.x,
+            h: dims.y,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn cpy_from(&self, x: i32, y: i32) -> T
+    {
+        let i = self.vec_idx(x, y);
+
+        return self.data[i];
+    }
+
+    #[allow(dead_code)]
+    pub fn cpy_from_p(&self, p: P) -> T
+    {
+        let i = self.vec_idx(p.x, p.y);
+
+        return self.data[i];
+    }
+}
+
+impl<T: Default> A2<T>
+{
+    #[allow(dead_code)]
+    pub fn new_default(dims: P) -> A2<T>
+    {
+        let mut a = A2 {
+            data: Vec::new(),
+            w: dims.x,
+            h: dims.y,
+        };
+
+        a.data.resize_default(
+            (a.w * a.h) as usize,
+        );
+
+        return a;
+    }
+}
+
 // -----------------------------------------------------------------------------
 // Test cases
 // -----------------------------------------------------------------------------
+#[cfg(test)]
+#[derive(Copy)]
+pub struct TestStructClonable
+{
+    pub v: i32,
+}
+
+impl Clone for TestStructClonable
+{
+    fn clone(&self) -> TestStructClonable
+    {
+        TestStructClonable { v: self.v }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -219,7 +406,7 @@ mod tests {
     #[test]
     fn test_p()
     {
-        // Verify copy
+        // Test copy
         let p0 = P { x: 3, y: 5 };
 
         let p1 = p0;
@@ -227,40 +414,67 @@ mod tests {
         assert_eq!(p0.x, p1.x);
         assert_eq!(p0.y, p1.y);
 
-        // Verify comparison
+        // Test comparison
         assert!(p0 == p1);
 
-        // Verify offset
-        let p2 = p0.offset_p(&P { x: 100, y: 200 });
+        // Test offset
+        let p2 = p0.offset_p(P { x: 100, y: 200 });
 
         assert_eq!(103, p2.x);
         assert_eq!(205, p2.y);
 
-        // Verify addition
+        // Test addition
         let p3 = p0 + P { x: 200, y: 300 };
 
         assert_eq!(203, p3.x);
         assert_eq!(305, p3.y);
 
-        // Verify subtraction
+        // Test subtraction
         let p4 = p0 - P { x: 10, y: 1 };
 
         assert_eq!(-7, p4.x);
         assert_eq!(4, p4.y);
 
-        // Verify direction conversion
+        // Test direction conversion
         let d = P { x: 1, y: 0 };
 
         let dir = d.dir();
 
         assert!(dir == Dir::Right);
 
-        // Verify signs
+        // Test signs
         let p = P { x: -42, y: 99 };
 
         let signs = p.signs();
 
         assert_eq!(signs.x, -1);
         assert_eq!(signs.y, 1);
+    }
+
+    #[test]
+    fn test_a2()
+    {
+        // Test array of bools
+        let mut bools: A2<bool> = A2::new_default(P { x: 5, y: 3 });
+
+        assert_eq!(bools.size(), 5 * 3);
+
+        assert_eq!(*bools.at(4, 2), false);
+
+        *bools.at(4, 2) = true;
+
+        assert_eq!(*bools.at(4, 2), true);
+
+        // Test array of structs
+        let mut test_structs: A2<TestStructClonable> =
+            A2::new_copied(P { x: 512, y: 256 }, TestStructClonable { v: 42 });
+
+        assert_eq!(test_structs.size(), 512 * 256);
+
+        test_structs.at(17, 99).v = 1337;
+
+        assert_eq!(test_structs.at(16, 99).v, 42);
+
+        assert_eq!(test_structs.at(17, 99).v, 1337);
     }
 }
