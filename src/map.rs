@@ -1,10 +1,10 @@
 extern crate sdl2;
 
 use geometry::P;
+use geometry::A2;
 use entity::Entity;
 use sdl2::rect::Rect;
-use sdl2::sys::SDL_Texture;
-use sdl2::render::Canvas;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -12,37 +12,71 @@ const TILE_SIZE:  i32 = 16;
 
 pub struct Map {
 
-    pub map: Vec<Entity>,
+    pub map: A2<Vec<Entity>>,
 }
 
 impl Map {
     pub fn new() -> Map{
-        let mut map = Vec::new();
-        Map::init_map(&mut map);
+
+        let mut map: A2<Vec<Entity>>;
+        
+        map = Map::read_map();
         Map { map: map }
+        
     }
-    
-    fn init_map(map: &mut Vec<Entity>) {
+
+    fn read_map() -> A2<Vec<Entity>> {
         
         let mut f = BufReader::new(File::open("data/map").unwrap());
-
+        
         let mut s = String::new();
+
         f.read_line(&mut s).unwrap();
 
+        let mut width :i32 = 0;
+        let mut height :i32 = 0;
+
+        let mut first_line :bool = true;
+
+        let mut tiletypes :Vec<i32> = Vec::new();
+        
         for(_y, line) in f.lines().enumerate() {
 
             for(_x, number) in line.unwrap().split(char::is_whitespace).enumerate() {
-                let new_x: i32 = _x as i32;
-                let new_y: i32 = _y as i32;
-                map.push(Entity::new( P{x: new_x, y: new_y},
-                                      false,
-                                      number.trim().parse().unwrap(),
-                                      "ground".to_string()));
+                
+                if first_line {
+                    width += 1;
+                }
+                tiletypes.push(number.trim().parse().unwrap());
+                
+            }
+            height += 1;
+        }
+        
+        let dims :P = P{x: width, y: height};
+        
+        let mut map: A2<Vec<Entity>> = A2::new_default(dims);
+
+
+        let mut tile_counter :i32 = 0;
+        
+        for _y in 0..height {
+
+            for _x in 0..width {
+
+                map.at(_x as i32, _y as i32).push(Entity::new( P{x: _x as i32, y: _y as i32},
+                                                               false,
+                                                               tiletypes[tile_counter as usize],
+                                                               "ground".to_string()));
+                
             }
             
         }
         
+        return map;
+        
     }
+    
     
     pub fn render_map(&mut self,
                       sdl_texture: &sdl2::render::Texture,
@@ -51,31 +85,40 @@ impl Map {
         let mut src = Rect::new(0, 0, TILE_SIZE as u32, TILE_SIZE as u32);
         let mut dst = Rect::new(0, 0, TILE_SIZE as u32, TILE_SIZE as u32);
 
-        for i in &self.map {
-            let dst_p: P = i.get_pos();
-            let tiletype: i32 = i.get_tile_type();;
-            dst.x = dst_p.x*TILE_SIZE as i32;
-            dst.y = dst_p.y*TILE_SIZE as i32;
+        for _y in 0..self.map.h() {
+            
+            for _x in 0..self.map.w() {
 
-            // TODO: Enums?
-            
-            if tiletype == 0 {
-                src.x = 0*TILE_SIZE as i32;
-                src.y = 0*TILE_SIZE as i32;
+                for i in self.map.at(_x, _y) {
+                    let dst_p: P = i.get_pos();
+                    let tiletype: i32 = i.get_tile_type();;
+                    dst.x = dst_p.x*TILE_SIZE as i32;
+                    dst.y = dst_p.y*TILE_SIZE as i32;
+
+                    // TODO: Enums?
+                    
+                    if tiletype == 0 {
+                        src.x = 0*TILE_SIZE as i32;
+                        src.y = 0*TILE_SIZE as i32;
+                    }
+                    else if tiletype == 1 {
+                        src.x = 1*TILE_SIZE as i32;
+                        src.y = 0*TILE_SIZE as i32;
+                    }
+                    else if tiletype == 2 {
+                        src.x = 2*TILE_SIZE as i32;
+                        src.y = 0*TILE_SIZE as i32;
+                    }
+                    
+                    sdl_context.copy(sdl_texture, Some(src), Some(dst)).unwrap();
+                }
+
+                
             }
-            else if tiletype == 1 {
-                src.x = 1*TILE_SIZE as i32;
-                src.y = 0*TILE_SIZE as i32;
-            }
-            else if tiletype == 2 {
-                src.x = 2*TILE_SIZE as i32;
-                src.y = 0*TILE_SIZE as i32;
-            }
-            
-            sdl_context.copy(sdl_texture, Some(src), Some(dst)).unwrap();
-            
         }
-        
+
+
     }
 
 }
+
