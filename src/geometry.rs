@@ -391,6 +391,7 @@ pub struct TestStructClonable
     pub v: i32,
 }
 
+#[cfg(test)]
 impl Clone for TestStructClonable
 {
     fn clone(&self) -> TestStructClonable
