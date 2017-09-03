@@ -1,7 +1,6 @@
-use geometry;
-use geometry::A2;
-use geometry::P;
-use geometry::R;
+use geometry::*;
+
+pub const FLOOD_VALUE_UNREACHED: i32 = -1;
 
 #[allow(dead_code)]
 pub fn floodfill(
@@ -11,7 +10,10 @@ pub fn floodfill(
     travel_lmt: Option<i32>,
 ) -> A2<i32>
 {
-    let mut result: A2<i32> = A2::new_default(blocked.dims());
+    let mut result: A2<i32> =
+        A2::new_copied(blocked.dims(), FLOOD_VALUE_UNREACHED);
+
+    *result.at_p(p0) = 0;
 
     // Vector of positions to travel to
     let mut positions: Vec<P> = Vec::new();
@@ -26,14 +28,6 @@ pub fn floodfill(
 
     let mut path_exists = true;
 
-    let bounds = R {
-        p0: P { x: 1, y: 1 },
-        p1: P {
-            x: result.w() - 2,
-            y: result.h() - 2,
-        },
-    };
-
     let mut p = p0;
 
     let mut v: i32 = 0;
@@ -46,24 +40,24 @@ pub fn floodfill(
     {
         // Flood around the current position, and add those positions to the
         // list of positions to travel to
-        for d in geometry::OFFSETS.iter()
+        for d in OFFSETS.iter()
         {
             let new_p = p + *d;
 
             // Not inside the bounds?
-            if !bounds.is_p_inside(new_p)
+            if !result.is_p_inside(new_p)
             {
                 continue;
             }
 
             // Blocked?
-            if blocked.cpy_from_p(new_p)
+            if blocked.copy_from_p(new_p)
             {
                 continue;
             }
 
             // Already visited?
-            if *result.at_p(new_p) != 0
+            if *result.at_p(new_p) != FLOOD_VALUE_UNREACHED
             {
                 continue;
             }
@@ -74,7 +68,7 @@ pub fn floodfill(
                 continue;
             }
 
-            v = result.cpy_from_p(p);
+            v = result.copy_from_p(p);
 
             if travel_lmt.is_none() || (v < travel_lmt.unwrap())
             {
@@ -151,7 +145,7 @@ mod tests {
     {
         let p0 = P { x: 50, y: 75 };
 
-        let dims = P { x: 512, y: 256 };
+        let dims = P { x: 100, y: 100 };
 
         let mut blocked: A2<bool> = A2::new_default(dims);
 
@@ -161,7 +155,8 @@ mod tests {
 
         let flood = floodfill(p0, None, &blocked, None);
 
-        // Expected flood values, where
+        // Expected flood values, where:
+        //
         // @ = origin (p0)
         // # = blocked positions
         //
@@ -174,11 +169,14 @@ mod tests {
         // 2 1 1 # 3 4 5
         //
         // 2 2 2 2 4 4 5
-        //
-        assert_eq!(flood.cpy_from(50, 75), 0);
-        assert_eq!(flood.cpy_from(51, 75), 0); // Blocked
-        assert_eq!(flood.cpy_from(52, 75), 4); // Around a blocked area
-        assert_eq!(flood.cpy_from(53, 75), 4);
-        assert_eq!(flood.cpy_from(54, 75), 5);
+
+        // Starting position:
+        assert_eq!(flood.copy_from_p(p0), 0);
+        // Blocked;
+        assert_eq!(flood.copy_from(51, 75), FLOOD_VALUE_UNREACHED);
+        // Around a blocked area:
+        assert_eq!(flood.copy_from(52, 75), 4);
+        assert_eq!(flood.copy_from(53, 75), 4);
+        assert_eq!(flood.copy_from(54, 75), 5);
     }
 }

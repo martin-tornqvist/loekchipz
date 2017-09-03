@@ -100,6 +100,7 @@ pub fn sign(value: i32) -> i32
 // Position/dimensions
 // -----------------------------------------------------------------------------
 #[derive(Copy)]
+#[derive(Debug)]
 pub struct P
 {
     pub x: i32,
@@ -207,7 +208,11 @@ impl Sub for P
     }
 }
 
-// A nice array to iterate over in algorithms
+// -----------------------------------------------------------------------------
+// Some nice arrays to iterate over in algorithms
+// -----------------------------------------------------------------------------
+
+// Offsets sorted for optimized 2d array iteration (minimized jumping)
 //
 // Each index corresponds to a direction:
 //
@@ -219,15 +224,38 @@ impl Sub for P
 //
 #[allow(dead_code)]
 pub const OFFSETS: [P; 9] = [
-    P { x: -1, y: -1 },
-    P { x: 0, y: -1 },
-    P { x: 1, y: -1 },
-    P { x: -1, y: 0 },
-    P { x: 0, y: 0 },
-    P { x: 1, y: 0 },
-    P { x: -1, y: 1 },
-    P { x: 0, y: 1 },
-    P { x: 1, y: 1 },
+    P { x: -1, y: -1 }, // Up left
+    P { x: 0, y: -1 },  // Up
+    P { x: 1, y: -1 },  // Up right
+    P { x: -1, y: 0 },  // Left
+    P { x: 0, y: 0 },   // Center
+    P { x: 1, y: 0 },   // Right
+    P { x: -1, y: 1 },  // Down left
+    P { x: 0, y: 1 },   // Down
+    P { x: 1, y: 1 },   // Down right
+];
+
+// Offsets prioritizing cardinal movement (gives nicer pathfinding for example),
+// with no center value
+//
+// Each index corresponds to a direction:
+//
+// 4 2 5
+//  \|/
+// 0-X-1
+//  /|\
+// 6 3 7
+//
+#[allow(dead_code)]
+pub const OFFSETS_CARDINAL_FIRST_NO_CENTER: [P; 8] = [
+    P { x: -1, y: 0 },  // Left
+    P { x: 1, y: 0 },   // Right
+    P { x: 0, y: -1 },  // Up
+    P { x: 0, y: 1 },   // Down
+    P { x: -1, y: -1 }, // Up left
+    P { x: 1, y: -1 },  // Up right
+    P { x: -1, y: 1 },  // Down left
+    P { x: 1, y: 1 },   // Down right
 ];
 
 // -----------------------------------------------------------------------------
@@ -327,6 +355,15 @@ impl<T> A2<T>
     }
 
     #[allow(dead_code)]
+    pub fn is_p_inside(&self, p: P) -> bool
+    {
+        let x_ok = (p.x >= 0) && (p.x < self.w);
+        let y_ok = (p.y >= 0) && (p.y < self.h);
+
+        return x_ok && y_ok;
+    }
+
+    #[allow(dead_code)]
     fn vec_idx(&self, x: i32, y: i32) -> usize
     {
         return vec_idx(x, y, self.w);
@@ -346,7 +383,7 @@ impl<T: Copy> A2<T>
     }
 
     #[allow(dead_code)]
-    pub fn cpy_from(&self, x: i32, y: i32) -> T
+    pub fn copy_from(&self, x: i32, y: i32) -> T
     {
         let i = self.vec_idx(x, y);
 
@@ -354,7 +391,7 @@ impl<T: Copy> A2<T>
     }
 
     #[allow(dead_code)]
-    pub fn cpy_from_p(&self, p: P) -> T
+    pub fn copy_from_p(&self, p: P) -> T
     {
         let i = self.vec_idx(p.x, p.y);
 
