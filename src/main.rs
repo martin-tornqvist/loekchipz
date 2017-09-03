@@ -5,6 +5,7 @@ extern crate sdl2;
 mod geometry;
 mod states;
 mod floodfill;
+mod pathfind;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
