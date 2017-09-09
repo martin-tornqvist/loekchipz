@@ -7,6 +7,9 @@ use sdl2;
 // -----------------------------------------------------------------------------
 pub trait State
 {
+    // Returns a descriptive state name (for debug purposes)
+    fn name(&self) -> &str;
+
     fn on_pushed(&mut self) -> StateFinished;
 
     fn on_start(&mut self) -> StateFinished;
@@ -85,6 +88,8 @@ impl States
             return StateFinished::No;
         }
 
+        log!("Starting state '{}'", top.state.name());
+
         let state_finished = top.state.on_start();
 
         top.is_started = true;
@@ -112,6 +117,8 @@ impl States
     #[allow(dead_code)]
     pub fn push(&mut self, state: Box<State>)
     {
+        log!("Pushing state '{}'", state.name());
+
         let node = Box::new(StateNode {
             state: state,
             is_started: false,
@@ -129,6 +136,11 @@ impl States
         {
             return;
         }
+
+        log!(
+            "Popping state '{}'",
+            self.nodes.last().unwrap().state.name()
+        );
 
         self.nodes
             .pop()

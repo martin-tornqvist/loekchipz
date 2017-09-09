@@ -2,6 +2,8 @@
 
 extern crate sdl2;
 
+#[macro_use]
+mod log;
 mod geometry;
 mod states;
 mod floodfill;
@@ -15,6 +17,8 @@ use std::time::Duration;
 
 pub fn main()
 {
+    log!("Init SDL");
+
     let sdl_context = sdl2::init().unwrap();
 
     let video_subsystem = sdl_context.video().unwrap();
@@ -41,6 +45,7 @@ pub fn main()
     {
         if states.is_empty()
         {
+            log!("No states left - bye!");
             break 'state_loop;
         }
 

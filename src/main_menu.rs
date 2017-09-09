@@ -7,17 +7,18 @@ pub struct MainMenuState {}
 
 impl State for MainMenuState
 {
+    fn name(&self) -> &str
+    {
+        return "Main menu";
+    }
+
     fn on_pushed(&mut self) -> StateFinished
     {
-        println!("MainMenuState: on_pushed()");
-
         return StateFinished::No;
     }
 
     fn on_start(&mut self) -> StateFinished
     {
-        println!("MainMenuState: on_start()");
-
         return StateFinished::No;
     }
 
@@ -49,6 +50,5 @@ impl State for MainMenuState
 
     fn on_popped(&mut self)
     {
-        println!("MainMenuState: on_popped()");
     }
 }
