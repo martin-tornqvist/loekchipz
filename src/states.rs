@@ -125,7 +125,6 @@ impl States
     #[allow(dead_code)]
     pub fn push(&mut self, state: Box<State>)
     {
-
         log!("Pushing state '{}'", state.name());
 
         let node = Box::new(StateNode {

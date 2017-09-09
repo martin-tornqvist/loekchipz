@@ -15,19 +15,16 @@ impl State for GameState
 {
     fn name(&self) -> &str
     {
-        return "GameState";
+        return "Game";
     }
 
     fn on_pushed(&mut self) -> StateFinished
     {
-        println!("GameState: on_pushed()");
-
         return StateFinished::No;
     }
 
     fn on_start(&mut self) -> StateFinished
     {
-        println!("GameState: on_start()");
         let mut m: Map = Map::new();
         return StateFinished::No;
     }
@@ -66,6 +63,6 @@ impl State for GameState
 
     fn on_popped(&mut self)
     {
-        println!("GameState: on_popped()");
+
     }
 }
