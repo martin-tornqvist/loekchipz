@@ -1,6 +1,7 @@
 use floodfill::*;
 use geometry::*;
 
+#[allow(dead_code)]
 pub fn pathfind(p0: P, p1: P, flood: &A2<i32>) -> Vec<P>
 {
     let mut path: Vec<P> = Vec::new();
@@ -28,22 +29,9 @@ pub fn pathfind(p0: P, p1: P, flood: &A2<i32>) -> Vec<P>
 
     path[(current_dist_from_p0 - 1) as usize] = p;
 
-    // Let's find the way back to the origin
-    for _ in 0..path.len()
+    // Find the way back to the origin
+    'path_loop: for _ in 0..(path.len() - 1)
     {
-        // Check if origin reached
-        for d in OFFSETS_CARDINAL_FIRST_NO_CENTER.iter()
-        {
-            let adj_p = p + *d;
-
-            if adj_p == p0
-            {
-                // Origin reached - thanks and goodbye!
-                return path;
-            }
-
-        } // Offset loop
-
         // Origin not yet reached, find the next step
         for d in OFFSETS_CARDINAL_FIRST_NO_CENTER.iter()
         {
@@ -83,8 +71,6 @@ pub fn pathfind(p0: P, p1: P, flood: &A2<i32>) -> Vec<P>
         } // Offset loop
 
     } // Path loop
-
-    assert!(false);
 
     return path;
 }
