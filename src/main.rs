@@ -37,14 +37,11 @@ impl State for MainMenuState
 
     fn draw(&mut self)
     {
-        println!("MainMenuState: draw()");
     }
 
     // TODO: Don't pass SDL stuff here, find a better way to read user input
     fn update(&mut self, sdl_context: &sdl2::Sdl) -> StateFinished
     {
-        println!("MainMenuState: update()");
-
         let mut event_pump = sdl_context.event_pump().unwrap();
 
         for event in event_pump.poll_iter()
