@@ -10,15 +10,23 @@ mod floodfill;
 mod pathfind;
 mod main_menu;
 
+mod entity;
+mod gamestate;
+mod map;
+
+use gamestate::GameState;
 use main_menu::MainMenuState;
+
+use map::Map;
+use sdl2::pixels::Color;
 use states::StateFinished;
 use states::States;
+use std::path::Path;
 use std::time::Duration;
 
 pub fn main()
 {
     log!("Init SDL");
-
     let sdl_context = sdl2::init().unwrap();
 
     let video_subsystem = sdl_context.video().unwrap();
@@ -37,9 +45,18 @@ pub fn main()
 
     let mut canvas = window.into_canvas().build().unwrap();
 
+    let texture_creator = canvas.texture_creator();
+    let mut temp_surface = sdl2::surface::Surface::load_bmp(
+        Path::new("gfx/tile_sheet.bmp"),
+    ).unwrap();
+    temp_surface.set_color_key(true, Color::RGB(0xff, 0x00, 0xff));
+    let texture = texture_creator
+        .create_texture_from_surface(&temp_surface)
+        .unwrap();
+
     let mut states = States::new();
 
-    states.push(Box::new(MainMenuState {}));
+    states.push(Box::new(GameState { m: Map::new() }));
 
     'state_loop: loop
     {
@@ -60,7 +77,7 @@ pub fn main()
 
         canvas.clear();
 
-        states.draw();
+        states.draw(&texture, &mut canvas);
 
         canvas.present();
 
