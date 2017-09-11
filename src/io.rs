@@ -83,7 +83,7 @@ impl Io
         self.window.clear(&Color::rgb(0, 0, 0));
     }
 
-    pub fn update(&mut self)
+    pub fn update_screen(&mut self)
     {
         self.window.display();
     }

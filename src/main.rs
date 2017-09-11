@@ -48,9 +48,8 @@ pub fn main()
 
         states.draw(&mut io);
 
-        io.update();
+        io.update_screen();
 
-        // TODO: Handle input
         let state_finished = states.update(&mut io);
 
         if state_finished == StateFinished::Yes

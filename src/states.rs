@@ -14,7 +14,6 @@ pub trait State
 
     fn draw(&mut self, renderer: &mut Io);
 
-    // TODO: Don't pass SDL stuff here, find a better way to read user input
     fn update(&mut self, input: &mut Io) -> StateFinished;
 
     fn on_popped(&mut self);
