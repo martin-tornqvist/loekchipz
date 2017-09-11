@@ -1,8 +1,7 @@
-use sdl2;
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
+use io::Io;
 use states::*;
 
+#[allow(dead_code)]
 pub struct MainMenuState {}
 
 impl State for MainMenuState
@@ -22,34 +21,13 @@ impl State for MainMenuState
         return StateFinished::No;
     }
 
-    fn draw(
-        &mut self,
-        _texture: &sdl2::render::Texture,
-        canvas: &mut sdl2::render::WindowCanvas,
-    )
+    fn draw(&mut self, _: &mut Io)
     {
     }
 
-    // TODO: Don't pass SDL stuff here, find a better way to read user input
-    fn update(&mut self, sdl_context: &sdl2::Sdl) -> StateFinished
+    fn update(&mut self, _: &mut Io) -> StateFinished
     {
-        let mut event_pump = sdl_context.event_pump().unwrap();
-
-        for event in event_pump.poll_iter()
-        {
-            match event
-            {
-                Event::Quit { .. } |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } =>
-                {
-                    return StateFinished::Yes;
-                }
-                _ =>
-                {}
-            }
-        }
-
-        return StateFinished::No;
+        return StateFinished::Yes;
     }
 
     fn on_popped(&mut self)

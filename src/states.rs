@@ -1,6 +1,4 @@
-// TODO: Don't pass SDL stuff here, find a better way to read user input
-
-use sdl2;
+use io::Io;
 
 // -----------------------------------------------------------------------------
 // State - individual states of different types implements this trait
@@ -14,14 +12,10 @@ pub trait State
 
     fn on_start(&mut self) -> StateFinished;
 
-    fn draw(
-        &mut self,
-        texture: &sdl2::render::Texture,
-        canvas: &mut sdl2::render::WindowCanvas,
-    );
+    fn draw(&mut self, renderer: &mut Io);
 
     // TODO: Don't pass SDL stuff here, find a better way to read user input
-    fn update(&mut self, sdl_context: &sdl2::Sdl) -> StateFinished;
+    fn update(&mut self, input: &mut Io) -> StateFinished;
 
     fn on_popped(&mut self);
 }
@@ -102,24 +96,19 @@ impl States
     }
 
     #[allow(dead_code)]
-    pub fn draw(
-        &mut self,
-        texture: &sdl2::render::Texture,
-        canvas: &mut sdl2::render::WindowCanvas,
-    )
+    pub fn draw(&mut self, renderer: &mut Io)
     {
         // TODO: We might want to enable drawing states on top of other states,
         //       if so, add a parameter such as "draw_overlayed" for the states,
         //       and iterate backwards over the state vector here, until (and
         //       including) the first state which shall NOT be drawn overlayed.
-        self.top().state.draw(texture, canvas);
+        self.top().state.draw(renderer);
     }
 
-    // TODO: Don't pass SDL stuff here, find a better way to read user input
     #[allow(dead_code)]
-    pub fn update(&mut self, sdl_context: &sdl2::Sdl) -> StateFinished
+    pub fn update(&mut self, input: &mut Io) -> StateFinished
     {
-        self.top().state.update(&sdl_context)
+        self.top().state.update(input)
     }
 
     #[allow(dead_code)]

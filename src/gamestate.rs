@@ -1,10 +1,7 @@
-extern crate sdl2;
+use io::{Io, Key};
 use map::Map;
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
 use states::State;
 use states::StateFinished;
-
 
 pub struct GameState
 {
@@ -25,37 +22,27 @@ impl State for GameState
 
     fn on_start(&mut self) -> StateFinished
     {
-        let mut m: Map = Map::new();
         return StateFinished::No;
     }
 
-    fn draw(
-        &mut self,
-        texture: &sdl2::render::Texture,
-        canvas: &mut sdl2::render::WindowCanvas,
-    )
+    fn draw(&mut self, renderer: &mut Io)
     {
-        self.m.render_map(&texture, canvas);
+        self.m.render_map(renderer);
     }
 
-    // TODO: Don't pass SDL stuff here, find a better way to read user input
-    fn update(&mut self, sdl_context: &sdl2::Sdl) -> StateFinished
+    fn update(&mut self, io: &mut Io) -> StateFinished
     {
+        let d = io.read();
 
-        let mut event_pump = sdl_context.event_pump().unwrap();
-
-        for event in event_pump.poll_iter()
+        // TODO: Only for demo purposes, remove soon...
+        if d.char.is_some()
         {
-            match event
-            {
-                Event::Quit { .. } |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } =>
-                {
-                    return StateFinished::Yes;
-                }
-                _ =>
-                {}
-            }
+            log!("char: {}", d.char.unwrap());
+        }
+
+        if d.key == Some(Key::Esc)
+        {
+            return StateFinished::Yes;
         }
 
         return StateFinished::No;

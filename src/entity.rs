@@ -1,19 +1,20 @@
-use geometry::P;
 use geometry::Dir;
+use geometry::P;
 
 #[allow(dead_code)]
-pub struct Entity{
-    
+pub struct Entity
+{
     pos: P,
     is_blocking: bool,
     tiletype: i32,
     name: String,
-        
 }
 
-impl Entity {
-
-    pub fn new(pos: P, is_blocking: bool, tiletype: i32, name: String) -> Entity {
+impl Entity
+{
+    pub fn new(pos: P, is_blocking: bool, tiletype: i32, name: String)
+        -> Entity
+    {
         Entity {
             pos: pos,
             is_blocking: is_blocking,
@@ -21,22 +22,28 @@ impl Entity {
             name: name,
         }
     }
-    
-    
-    pub fn move_pos(&mut self, p: P) {
+
+    #[allow(dead_code)]
+    pub fn move_pos(&mut self, p: P)
+    {
         self.pos = p;
     }
 
-    pub fn move_dir(&mut self, d: Dir){
+    #[allow(dead_code)]
+    pub fn move_dir(&mut self, _: Dir)
+    {
         // ...
     }
 
-    pub fn get_pos(&self) -> P {
+    #[allow(dead_code)]
+    pub fn get_pos(&self) -> P
+    {
         return self.pos;
     }
 
-    pub fn get_tile_type(&self) -> i32 {
+    #[allow(dead_code)]
+    pub fn get_tile_type(&self) -> i32
+    {
         return self.tiletype;
     }
-    
 }
