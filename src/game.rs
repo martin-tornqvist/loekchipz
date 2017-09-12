@@ -1,15 +1,25 @@
-use game::GameState;
-use io::*;
+use io::{Io, Key};
+use map::Map;
 use states::*;
 
-#[allow(dead_code)]
-pub struct MainMenuState {}
+pub struct GameState
+{
+    pub m: Map,
+}
 
-impl State for MainMenuState
+impl GameState
+{
+    pub fn new() -> GameState
+    {
+        GameState { m: Map::new() }
+    }
+} // impl GameState
+
+impl State for GameState
 {
     fn name(&self) -> &str
     {
-        return "Main menu";
+        return "Game";
     }
 
     fn on_pushed(&mut self)
@@ -25,23 +35,15 @@ impl State for MainMenuState
     {
     }
 
-    fn draw(&mut self, _: &mut Io)
+    fn draw(&mut self, renderer: &mut Io)
     {
+        self.m.render_map(renderer);
     }
 
     fn update(&mut self, io: &mut Io) -> Vec<StateSignal>
     {
         let d = io.read();
 
-        // Proceed to game state?
-        if d.char == 'n'
-        {
-            let game_state = Box::new(GameState::new());
-
-            return vec![StateSignal::Push { state: game_state }];
-        }
-
-        // Exit game?
         if d.key == Key::Esc
         {
             return vec![StateSignal::Pop];
@@ -54,4 +56,4 @@ impl State for MainMenuState
     {
 
     }
-}
+} // impl State for GameState

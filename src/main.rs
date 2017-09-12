@@ -8,14 +8,12 @@ mod floodfill;
 mod pathfind;
 mod main_menu;
 mod entity;
-mod gamestate;
+mod game;
 mod map;
 mod io;
 
-use gamestate::GameState;
-use map::Map;
-use states::StateFinished;
-use states::States;
+use main_menu::MainMenuState;
+use states::*;
 use std::time::Duration;
 
 pub fn main()
@@ -24,7 +22,7 @@ pub fn main()
 
     let mut states = States::new();
 
-    states.push(Box::new(GameState { m: Map::new() }));
+    states.push(Box::new(MainMenuState {}));
 
     'state_loop: loop
     {
@@ -35,11 +33,12 @@ pub fn main()
             break 'state_loop;
         }
 
-        let state_finished = states.start();
+        let signals_start = states.start();
 
-        if state_finished == StateFinished::Yes
+        if !signals_start.is_empty()
         {
-            states.pop();
+            // Push/pop states etc
+            states.process_signals(signals_start);
 
             continue;
         }
@@ -50,11 +49,14 @@ pub fn main()
 
         io.update_screen();
 
-        let state_finished = states.update(&mut io);
+        let signals_update = states.update(&mut io);
 
-        if state_finished == StateFinished::Yes
+        if !signals_update.is_empty()
         {
-            states.pop();
+            // Push/pop states etc
+            states.process_signals(signals_update);
+
+            continue;
         }
 
         std::thread::sleep(Duration::from_millis(10));

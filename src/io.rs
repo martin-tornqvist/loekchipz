@@ -7,6 +7,7 @@ use self::sfml::window::{ContextSettings, VideoMode, style, Event,
 #[derive(PartialEq, Eq)]
 pub enum Key
 {
+    Undefined,
     Esc,
     Space,
     Return,
@@ -30,8 +31,8 @@ fn sfml_key_to_char(
 
 pub struct InputData
 {
-    pub char: Option<char>,
-    pub key: Option<Key>,
+    pub char: char,
+    pub key: Key,
 }
 
 impl InputData
@@ -39,8 +40,8 @@ impl InputData
     fn new() -> InputData
     {
         InputData {
-            char: None,
-            key: None,
+            char: 0 as char,
+            key: Key::Undefined,
         }
     }
 }
@@ -101,14 +102,13 @@ impl Io
                     // Letters
                     if (code >= SfmlKey::A) && (code <= SfmlKey::Z)
                     {
-                        d.char = Some(sfml_key_to_char('a', SfmlKey::A, code));
+                        d.char = sfml_key_to_char('a', SfmlKey::A, code);
                         return d;
                     }
                     // Numbers
                     else if (code >= SfmlKey::Num0) && (code <= SfmlKey::Num9)
                     {
-                        d.char =
-                            Some(sfml_key_to_char('0', SfmlKey::Num0, code));
+                        d.char = sfml_key_to_char('0', SfmlKey::Num0, code);
                         return d;
                     }
                     // Special keys
@@ -118,17 +118,17 @@ impl Io
                         {
                             SfmlKey::Escape =>
                             {
-                                d.key = Some(Key::Esc);
+                                d.key = Key::Esc;
                                 return d;
                             }
                             SfmlKey::Space =>
                             {
-                                d.key = Some(Key::Space);
+                                d.key = Key::Space;
                                 return d;
                             }
                             SfmlKey::Return =>
                             {
-                                d.key = Some(Key::Return);
+                                d.key = Key::Return;
                                 return d;
                             }
                             _ =>

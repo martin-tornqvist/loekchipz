@@ -8,30 +8,31 @@ pub trait State
     // Returns a descriptive state name (for debug purposes)
     fn name(&self) -> &str;
 
-    fn on_pushed(&mut self) -> StateFinished;
+    fn on_pushed(&mut self);
 
-    fn on_start(&mut self) -> StateFinished;
+    fn on_start(&mut self) -> Vec<StateSignal>;
 
-    fn draw(&mut self, renderer: &mut Io);
+    fn on_resume(&mut self);
 
-    fn update(&mut self, input: &mut Io) -> StateFinished;
+    fn draw(&mut self, io: &mut Io);
+
+    fn update(&mut self, io: &mut Io) -> Vec<StateSignal>;
 
     fn on_popped(&mut self);
 }
 
 // -----------------------------------------------------------------------------
-// State action return value
+// State signals
 // -----------------------------------------------------------------------------
-#[allow(dead_code)]
-#[derive(PartialEq, Eq)]
-pub enum StateFinished
+pub enum StateSignal
 {
-    No,
-    Yes,
+    Pop,
+    Push
+    { state: Box<State> },
 }
 
 // -----------------------------------------------------------------------------
-// StateNode - stored by the State struct
+// StateNode - stored by the state handler
 // -----------------------------------------------------------------------------
 struct StateNode
 {
@@ -54,63 +55,63 @@ impl States
         States { nodes: vec![] }
     }
 
-    pub fn is_empty(&self) -> bool
+    pub fn process_signals(&mut self, signals: Vec<StateSignal>)
     {
-        self.nodes.is_empty()
+        for sig in signals
+        {
+            match sig
+            {
+                StateSignal::Pop =>
+                {
+                    log!("Received StateSignal::Pop");
+                    self.pop();
+                }
+                StateSignal::Push { state } =>
+                {
+                    log!(
+                        "Received StateSignal::Push, with state '{}'",
+                        state.name()
+                    );
+                    self.push(state);
+                }
+            }
+        }
     }
 
-    fn top_idx(&self) -> usize
-    {
-        assert!(!self.nodes.is_empty());
-
-        let n = self.nodes.len();
-
-        n - 1
-    }
-
-    fn top(&mut self) -> &mut Box<StateNode>
-    {
-        let i = self.top_idx();
-
-        &mut self.nodes[i]
-    }
-
-    #[allow(dead_code)]
-    pub fn start(&mut self) -> StateFinished
+    pub fn start(&mut self) -> Vec<StateSignal>
     {
         let top = self.top();
 
         if top.is_started
         {
-            return StateFinished::No;
+            return Vec::new();
         }
 
         log!("Starting state '{}'", top.state.name());
 
-        let state_finished = top.state.on_start();
+        let signals = top.state.on_start();
 
         top.is_started = true;
 
-        return state_finished;
+        return signals;
     }
 
-    #[allow(dead_code)]
-    pub fn draw(&mut self, renderer: &mut Io)
+    pub fn draw(&mut self, io: &mut Io)
     {
         // TODO: We might want to enable drawing states on top of other states,
         //       if so, add a parameter such as "draw_overlayed" for the states,
         //       and iterate backwards over the state vector here, until (and
         //       including) the first state which shall NOT be drawn overlayed.
-        self.top().state.draw(renderer);
+        self.top().state.draw(io);
     }
 
-    #[allow(dead_code)]
-    pub fn update(&mut self, input: &mut Io) -> StateFinished
+    pub fn update(&mut self, io: &mut Io) -> Vec<StateSignal>
     {
-        self.top().state.update(input)
+        let signals = self.top().state.update(io);
+
+        return signals;
     }
 
-    #[allow(dead_code)]
     pub fn push(&mut self, state: Box<State>)
     {
         log!("Pushing state '{}'", state.name());
@@ -125,7 +126,6 @@ impl States
         self.top().state.on_pushed();
     }
 
-    #[allow(dead_code)]
     pub fn pop(&mut self)
     {
         if self.is_empty()
@@ -143,5 +143,38 @@ impl States
             .unwrap()
             .state
             .on_popped();
+
+        // Resume the new top state
+        if !self.nodes.is_empty() && self.top().is_started
+        {
+            let top = self.top();
+
+            log!("Resuming state '{}'", top.state.name());
+
+            top.state.on_resume();
+        }
+    }
+
+
+    pub fn is_empty(&self) -> bool
+    {
+
+        self.nodes.is_empty()
+    }
+
+    fn top_idx(&self) -> usize
+    {
+        assert!(!self.nodes.is_empty());
+
+        let n = self.nodes.len();
+
+        n - 1
+    }
+
+    fn top(&mut self) -> &mut Box<StateNode>
+    {
+        let i = self.top_idx();
+
+        &mut self.nodes[i]
     }
 } // impl States
