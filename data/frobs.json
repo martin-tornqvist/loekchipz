@@ -1,0 +1,14 @@
+{
+    "frobs": [
+        {
+            "name": "Hürx",
+            "hp": 8,
+            "damage": 4
+        },
+        {
+            "name": "Glẽx",
+            "hp": 500,
+            "damage": 75
+        }
+    ]
+}

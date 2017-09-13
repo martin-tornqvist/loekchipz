@@ -11,6 +11,9 @@ mod entity;
 mod game;
 mod map;
 mod io;
+mod frobs; // *** ONLY FOR DEMO PURPOSES - TO BE REMOVED ***
+
+extern crate json;
 
 use main_menu::MainMenuState;
 use states::*;
@@ -18,6 +21,12 @@ use std::time::Duration;
 
 pub fn main()
 {
+    // -------------------------------------------
+    // *** TESTING - TO BE REMOVED ***
+    // -------------------------------------------
+    frobs::test_load_frobs();
+    // -------------------------------------------
+
     let mut io = io::Io::new();
 
     let mut states = States::new();

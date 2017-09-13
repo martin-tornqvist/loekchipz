@@ -3,32 +3,14 @@ extern crate sfml;
 use self::sfml::graphics::{Color, RenderTarget, RenderWindow};
 use self::sfml::window::{ContextSettings, VideoMode, style, Event,
                          Key as SfmlKey};
+use std::error::Error;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
 
-#[derive(PartialEq, Eq)]
-pub enum Key
-{
-    Undefined,
-    Esc,
-    Space,
-    Return,
-}
-
-// TODO: Maybe it would be more effective to set up a table for this...
-fn sfml_key_to_char(
-    base_char: char,
-    base_sfml_key: SfmlKey,
-    sfml_key: SfmlKey,
-) -> char
-{
-    let mut val = base_char as u8;
-
-    val -= base_sfml_key as u8;
-
-    val += sfml_key as u8;
-
-    return val as char;
-}
-
+// -----------------------------------------------------------------------------
+// Public data returned when reading input
+// -----------------------------------------------------------------------------
 pub struct InputData
 {
     pub char: char,
@@ -46,6 +28,9 @@ impl InputData
     }
 }
 
+// -----------------------------------------------------------------------------
+// Public struct handling drawing and user input (wraps SFML)
+// -----------------------------------------------------------------------------
 pub struct Io
 {
     window: RenderWindow,
@@ -144,4 +129,81 @@ impl Io
         // No input was read
         return d;
     }
+}
+
+// -----------------------------------------------------------------------------
+// Read file to string
+// -----------------------------------------------------------------------------
+pub fn file_to_str(path: &Path) -> String
+{
+    let path_display = path.display();
+
+    let mut file = match File::open(&path)
+    {
+        Err(why) =>
+        {
+            panic!(
+                "Could not open file '{}': {}",
+                path_display,
+                why.description()
+            )
+        }
+        Ok(file) =>
+        {
+            log!("Successfully opened file '{}'", path_display);
+
+            file
+        }
+    };
+
+    let mut s = String::new();
+
+    match file.read_to_string(&mut s)
+    {
+        Err(why) =>
+        {
+            panic!(
+                "Could not read file '{}': {}",
+                path_display,
+                why.description()
+            )
+        }
+        Ok(_) =>
+        {
+            log!("Successfully read file '{}'", path_display);
+        }
+    }
+
+    return s;
+}
+
+// -----------------------------------------------------------------------------
+// Special keys
+// -----------------------------------------------------------------------------
+#[derive(PartialEq, Eq)]
+pub enum Key
+{
+    Undefined,
+    Esc,
+    Space,
+    Return,
+}
+
+// -----------------------------------------------------------------------------
+// Convert from SFML key to char
+// -----------------------------------------------------------------------------
+// TODO: Maybe it would be more effective to set up a table for this...
+fn sfml_key_to_char(
+    base_char: char,
+    base_sfml_key: SfmlKey,
+    sfml_key: SfmlKey,
+) -> char
+{
+    let mut val = base_char as u8;
+
+    val -= base_sfml_key as u8;
+
+    val += sfml_key as u8;
+
+    return val as char;
 }
