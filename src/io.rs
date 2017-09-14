@@ -1,8 +1,10 @@
 extern crate sfml;
 
-use self::sfml::graphics::{Color, RenderTarget, RenderWindow};
+use self::sfml::graphics::{Color, RenderTarget, RenderWindow, Sprite, Texture,
+                           Transformable, IntRect};
 use self::sfml::window::{ContextSettings, VideoMode, style, Event,
                          Key as SfmlKey};
+use geometry::*;
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
@@ -34,6 +36,7 @@ impl InputData
 pub struct Io
 {
     window: RenderWindow,
+    texture: Texture,
 }
 
 impl Io
@@ -61,7 +64,12 @@ impl Io
 
         window.set_vertical_sync_enabled(true);
 
-        Io { window: window }
+        let mut texture = Texture::from_file("gfx/tile_sheet.png").unwrap();
+
+        Io {
+            window: window,
+            texture: texture,
+        }
     }
 
     pub fn clear_screen(&mut self)
@@ -72,6 +80,16 @@ impl Io
     pub fn update_screen(&mut self)
     {
         self.window.display();
+    }
+
+    pub fn draw(&mut self, src: R, dst: R)
+    {
+        let mut spr = Sprite::new();
+        spr.set_texture(&self.texture, true);
+        spr.set_texture_rect(&IntRect::new(src.p0.x, src.p0.y, 16, 16));
+        spr.set_position2f(dst.p0.x as f32, dst.p0.y as f32);
+
+        self.window.draw(&spr);
     }
 
     pub fn read(&mut self) -> InputData

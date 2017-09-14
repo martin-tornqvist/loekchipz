@@ -98,59 +98,68 @@ impl Map
         return map;
     }
 
-    pub fn render_map(&mut self, _: &mut Io)
+    pub fn render_map(&mut self, io: &mut Io)
     {
-        // let mut src = R {
-        //     p0: P { x: 0, y: 0 },
-        //     p1: P {
-        //         x: TILE_SIZE as u32,
-        //         y: TILE_SIZE as u32,
-        //     },
-        // };
 
-        // let mut dst = src;
+        let mut src = R {
+            p0: P { x: 0, y: 0 },
+            p1: P {
+                x: TILE_SIZE,
+                y: TILE_SIZE,
+            },
+        };
 
-        // for y in 0..self.map.h()
-        // {
+        let mut dst = src;
 
-        //     for x in 0..self.map.w()
-        //     {
+        for y in 0..self.map.h()
+        {
 
-        //         for i in self.map.at(x, y)
-        //         {
-        //             let dst_p: P = i.get_pos();
-        //             let tiletype: i32 = i.get_tile_type();
-        //             dst.x = dst_p.x * TILE_SIZE as i32;
-        //             dst.y = dst_p.y * TILE_SIZE as i32;
+            for x in 0..self.map.w()
+            {
 
-        //             // TODO: Enums?
+                for i in self.map.at(x, y)
+                {
+                    let dst_p: P = i.get_pos();
+                    let tiletype: i32 = i.get_tile_type();
 
-        //             if tiletype == 0
-        //             {
-        //                 src.x = 0 * TILE_SIZE as i32;
-        //                 src.y = 0 * TILE_SIZE as i32;
-        //             }
-        //             else if tiletype == 1
-        //             {
-        //                 src.x = 1 * TILE_SIZE as i32;
-        //                 src.y = 0 * TILE_SIZE as i32;
-        //             }
-        //             else if tiletype == 2
-        //             {
-        //                 src.x = 2 * TILE_SIZE as i32;
-        //                 src.y = 0 * TILE_SIZE as i32;
-        //             }
-        //             else if tiletype == 3
-        //             {
-        //                 src.x = 3 * TILE_SIZE as i32;
-        //                 src.y = 0 * TILE_SIZE as i32;
-        //             }
+                    dst.p0.x = dst_p.x * TILE_SIZE as i32;
+                    dst.p0.y = dst_p.y * TILE_SIZE as i32;
 
-        //             sdl_context
-        //                 .copy(sdl_texture, Some(src), Some(dst))
-        //                 .unwrap();
-        //         }
-        //     }
-        // }
+                    // TODO: Enums?
+
+                    if tiletype == 0
+                    {
+                        src.p0.x = 0 * TILE_SIZE as i32;
+                        src.p0.y = 0 * TILE_SIZE as i32;
+                        src.p1.x = TILE_SIZE as i32;
+                        src.p1.y = TILE_SIZE as i32;
+                    }
+                    else if tiletype == 1
+                    {
+                        src.p0.x = 1 * TILE_SIZE as i32;
+                        src.p0.y = 0 * TILE_SIZE as i32;
+                        src.p1.x = TILE_SIZE as i32;
+                        src.p1.y = TILE_SIZE as i32;
+                    }
+                    else if tiletype == 2
+                    {
+                        src.p0.x = 2 * TILE_SIZE as i32;
+                        src.p0.y = 0 * TILE_SIZE as i32;
+                        src.p1.x = TILE_SIZE as i32;
+                        src.p1.y = TILE_SIZE as i32;
+                    }
+                    else if tiletype == 3
+                    {
+                        src.p0.x = 3 * TILE_SIZE as i32;
+                        src.p0.y = 0 * TILE_SIZE as i32;
+                        src.p1.x = TILE_SIZE as i32;
+                        src.p1.y = TILE_SIZE as i32;
+                    }
+
+                    io.draw(src, dst);
+
+                }
+            }
+        }
     }
 }
