@@ -17,11 +17,17 @@ pub fn test_load_frobs()
     // Accessing data is nice and easy!
     for frob in data["frobs"].members()
     {
+        let name: &str = frob["name"].as_str().unwrap();
+
+        let hp: i32 = frob["hp"].as_i32().unwrap();
+
+        let damage = frob["damage"].as_i32().unwrap();
+
         log!(
             "Hi my name is {}, I have {} hit points and do {} damage.",
-            frob["name"],
-            frob["hp"],
-            frob["damage"]
+            name,
+            hp,
+            damage
         );
     }
 }
