@@ -77,7 +77,7 @@ pub fn offset_to_dir(offset: P) -> Dir
         P { x: 1, y: 0 } => Dir::Right,
         P { x: -1, y: 1 } => Dir::DownLeft,
         P { x: 0, y: 1 } => Dir::Down,
-        P { x: 1, y: 1 } => Dir::DownRight,        
+        P { x: 1, y: 1 } => Dir::DownRight,
         _ => panic!("Not a direction offset"),
     }
 }

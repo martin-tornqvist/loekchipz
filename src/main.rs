@@ -14,7 +14,9 @@ mod io;
 mod frobs; // *** ONLY FOR DEMO PURPOSES - TO BE REMOVED ***
 
 extern crate json;
+extern crate sfml;
 
+use io::Io;
 use main_menu::MainMenuState;
 use states::*;
 use std::time::Duration;
@@ -27,7 +29,9 @@ pub fn main()
     frobs::test_load_frobs();
     // -------------------------------------------
 
-    let mut io = io::Io::new();
+    let mut texture = io::make_texture();
+
+    let mut io = Io::new(&mut texture);
 
     let mut states = States::new();
 

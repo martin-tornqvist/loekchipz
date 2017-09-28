@@ -1,10 +1,7 @@
-extern crate sfml;
-
-use self::sfml::graphics::{Color, RenderTarget, RenderWindow, Sprite, Texture,
-                           Transformable, IntRect};
-use self::sfml::window::{ContextSettings, VideoMode, style, Event,
-                         Key as SfmlKey};
 use geometry::*;
+use sfml::graphics::{Color, RenderTarget, RenderWindow, Sprite, Texture,
+                     Transformable, IntRect};
+use sfml::window::{ContextSettings, VideoMode, style, Event, Key as SfmlKey};
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
@@ -31,17 +28,25 @@ impl InputData
 }
 
 // -----------------------------------------------------------------------------
-// Public struct handling drawing and user input (wraps SFML)
+// Create a new texture object from external tile sheet
 // -----------------------------------------------------------------------------
-pub struct Io
+pub fn make_texture() -> Texture
 {
-    window: RenderWindow,
-    texture: Texture,
+    Texture::from_file("gfx/tile_sheet.png").unwrap()
 }
 
-impl Io
+// -----------------------------------------------------------------------------
+// Public struct handling drawing and user input (wraps SFML)
+// -----------------------------------------------------------------------------
+pub struct Io<'s>
 {
-    pub fn new() -> Io
+    window: RenderWindow,
+    pub sprites: Vec<Sprite<'s>>,
+}
+
+impl<'s> Io<'s>
+{
+    pub fn new(t: &'s mut Texture) -> Io<'s>
     {
         let title = "Loekchipz 0.0.1";
 
@@ -64,12 +69,19 @@ impl Io
 
         window.set_vertical_sync_enabled(true);
 
-        let mut texture = Texture::from_file("gfx/tile_sheet.png").unwrap();
-
-        Io {
+        let mut io = Io {
             window: window,
-            texture: texture,
-        }
+            sprites: Vec::new(),
+        };
+
+        // Init sprites
+        let mut spr = Sprite::with_texture(t);
+
+        spr.set_texture_rect(&IntRect::new(0, 0, 16, 16));
+
+        io.sprites.push(spr);
+
+        return io;
     }
 
     pub fn clear_screen(&mut self)
@@ -84,12 +96,13 @@ impl Io
 
     pub fn draw(&mut self, src: R, dst: R)
     {
-        let mut spr = Sprite::new();
-        spr.set_texture(&self.texture, true);
-        spr.set_texture_rect(&IntRect::new(src.p0.x, src.p0.y, 16, 16));
-        spr.set_position2f(dst.p0.x as f32, dst.p0.y as f32);
 
-        self.window.draw(&spr);
+        //    spr.set_position2f(dst.p0.x as f32, dst.p0.y as f32);
+
+        //    self.window.draw(
+
+        //self.sprites.get_mut(&0),
+        //);
     }
 
     pub fn read(&mut self) -> InputData
