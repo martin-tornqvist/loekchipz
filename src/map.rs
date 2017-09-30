@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 #[allow(dead_code)]
-const TILE_SIZE: i32 = 16;
+const TILE_SIZE: i32 = 32;
 
 pub struct Map
 {
@@ -124,39 +124,7 @@ impl Map
 
                     dst.p0.x = dst_p.x * TILE_SIZE as i32;
                     dst.p0.y = dst_p.y * TILE_SIZE as i32;
-
-                    // TODO: Enums?
-
-                    if tiletype == 0
-                    {
-                        src.p0.x = 0 * TILE_SIZE as i32;
-                        src.p0.y = 0 * TILE_SIZE as i32;
-                        src.p1.x = TILE_SIZE as i32;
-                        src.p1.y = TILE_SIZE as i32;
-                    }
-                    else if tiletype == 1
-                    {
-                        src.p0.x = 1 * TILE_SIZE as i32;
-                        src.p0.y = 0 * TILE_SIZE as i32;
-                        src.p1.x = TILE_SIZE as i32;
-                        src.p1.y = TILE_SIZE as i32;
-                    }
-                    else if tiletype == 2
-                    {
-                        src.p0.x = 2 * TILE_SIZE as i32;
-                        src.p0.y = 0 * TILE_SIZE as i32;
-                        src.p1.x = TILE_SIZE as i32;
-                        src.p1.y = TILE_SIZE as i32;
-                    }
-                    else if tiletype == 3
-                    {
-                        src.p0.x = 3 * TILE_SIZE as i32;
-                        src.p0.y = 0 * TILE_SIZE as i32;
-                        src.p1.x = TILE_SIZE as i32;
-                        src.p1.y = TILE_SIZE as i32;
-                    }
-
-                    io.draw(src, dst);
+                    io.draw("Grass", dst_p);
 
                 }
             }

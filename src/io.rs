@@ -1,11 +1,14 @@
 use geometry::*;
+use json;
 use sfml::graphics::{Color, RenderTarget, RenderWindow, Sprite, Texture,
                      Transformable, IntRect};
 use sfml::window::{ContextSettings, VideoMode, style, Event, Key as SfmlKey};
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
+use std::path::PathBuf;
 
 // -----------------------------------------------------------------------------
 // Public data returned when reading input
@@ -42,6 +45,7 @@ pub struct Io<'s>
 {
     window: RenderWindow,
     pub sprites: Vec<Sprite<'s>>,
+    sprite_table: HashMap<String, i32>,
 }
 
 impl<'s> Io<'s>
@@ -72,14 +76,39 @@ impl<'s> Io<'s>
         let mut io = Io {
             window: window,
             sprites: Vec::new(),
+            sprite_table: HashMap::new(),
         };
 
-        // Init sprites
-        let mut spr = Sprite::with_texture(t);
 
-        spr.set_texture_rect(&IntRect::new(0, 0, 16, 16));
+        let path: PathBuf = ["data", "tiles.json"].iter().collect();
 
-        io.sprites.push(spr);
+        let content = file_to_str(&path);
+
+        let data = json::parse(&content).unwrap();
+
+        for tile in data["tiles"].members()
+        {
+            let name: &str = tile["name"].as_str().unwrap();
+
+            let x: i32 = tile["x"].as_i32().unwrap();
+
+            let y: i32 = tile["y"].as_i32().unwrap();
+
+            let w: i32 = tile["w"].as_i32().unwrap();
+
+            let h: i32 = tile["h"].as_i32().unwrap();
+
+            let mut spr = Sprite::with_texture(t);
+
+            spr.set_texture_rect(&IntRect::new(x, y, w, h));
+
+            io.sprites.push(spr);
+
+            io.sprite_table.insert(
+                name.to_string(),
+                io.sprites.len() as i32,
+            );
+        }
 
         return io;
     }
@@ -94,15 +123,26 @@ impl<'s> Io<'s>
         self.window.display();
     }
 
-    pub fn draw(&mut self, src: R, dst: R)
+    fn lookup_tile(&mut self, tile_name: &str) -> i32
+    {
+        let tile_id = self.sprite_table.get(tile_name);
+
+        return *tile_id.unwrap();
+    }
+
+    pub fn draw(&mut self, tile_name: &str, dst: P)
     {
 
-        //    spr.set_position2f(dst.p0.x as f32, dst.p0.y as f32);
+        let tile_id = self.lookup_tile(tile_name);
 
-        //    self.window.draw(
+        self.sprites[tile_id as usize]
+            .set_position2f(dst.x as f32, dst.y as f32);
 
-        //self.sprites.get_mut(&0),
-        //);
+        self.window.draw(
+            &self.sprites[tile_id as
+                              usize],
+        );
+
     }
 
     pub fn read(&mut self) -> InputData
