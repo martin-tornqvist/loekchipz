@@ -25,8 +25,18 @@ impl State for MainMenuState
     {
     }
 
-    fn draw(&mut self, _: &mut Io)
+    fn draw(&mut self, io: &mut Io)
     {
+        let mut msg = String::default();
+
+        msg += "This is the main menu.\n\n";
+
+        msg += "Wow, this is an ugly font!\n\n";
+
+        msg += " * Press 'n' to continue.\n";
+        msg += " * Press 'esc' to quit.";
+
+        io.draw_text(&msg, 0, 0);
     }
 
     fn update(&mut self, io: &mut Io) -> Vec<StateSignal>

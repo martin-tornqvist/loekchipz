@@ -1,7 +1,7 @@
 extern crate sfml;
 
 use self::sfml::graphics::{Color, RenderTarget, RenderWindow, Sprite, Texture,
-                           Transformable, IntRect};
+                           Transformable, IntRect, Font, Text};
 use self::sfml::window::{ContextSettings, VideoMode, style, Event,
                          Key as SfmlKey};
 use geometry::*;
@@ -37,6 +37,7 @@ pub struct Io
 {
     window: RenderWindow,
     texture: Texture,
+    font: Font,
 }
 
 impl Io
@@ -64,11 +65,14 @@ impl Io
 
         window.set_vertical_sync_enabled(true);
 
-        let mut texture = Texture::from_file("gfx/tile_sheet.png").unwrap();
+        let texture = Texture::from_file("gfx/tile_sheet.png").unwrap();
+
+        let font = Font::from_file("font/alagard.ttf").unwrap();
 
         Io {
             window: window,
             texture: texture,
+            font: font,
         }
     }
 
@@ -82,6 +86,7 @@ impl Io
         self.window.display();
     }
 
+    // TODO: Draw what? /Martin
     pub fn draw(&mut self, src: R, dst: R)
     {
         let mut spr = Sprite::new();
@@ -90,6 +95,29 @@ impl Io
         spr.set_position2f(dst.p0.x as f32, dst.p0.y as f32);
 
         self.window.draw(&spr);
+    }
+
+    pub fn draw_text(&mut self, str: &str, x: i32, y: i32)
+    {
+        let mut text = Text::new();
+
+        text.set_font(&self.font);
+
+        text.set_character_size(40);
+
+        text.set_position2f(x as f32, y as f32);
+
+        // text.set_fill_color(&Color::white());
+
+        text.set_string(str);
+
+        self.window.draw(&text);
+    }
+
+    #[allow(dead_code)]
+    pub fn draw_text_p(&mut self, str: &str, p: P)
+    {
+        self.draw_text(str, p.x, p.y);
     }
 
     pub fn read(&mut self) -> InputData
