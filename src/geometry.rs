@@ -77,7 +77,7 @@ pub fn offset_to_dir(offset: P) -> Dir
         P { x: 1, y: 0 } => Dir::Right,
         P { x: -1, y: 1 } => Dir::DownLeft,
         P { x: 0, y: 1 } => Dir::Down,
-        P { x: 1, y: 1 } => Dir::DownRight,        
+        P { x: 1, y: 1 } => Dir::DownRight,
         _ => panic!("Not a direction offset"),
     }
 }
@@ -296,6 +296,24 @@ impl R
         let y_inside = (p.y >= self.p0.y) && (p.y <= self.p1.y);
 
         return x_inside && y_inside;
+    }
+
+    pub fn w(&self) -> i32
+    {
+        return (self.p1.x - self.p0.y) + 1;
+    }
+
+    pub fn h(&self) -> i32
+    {
+        return (self.p1.y - self.p0.y) + 1;
+    }
+
+    pub fn center(&self) -> P
+    {
+        P {
+            x: self.p0.x + self.w() / 2,
+            y: self.p0.y + self.h() / 2,
+        }
     }
 }
 

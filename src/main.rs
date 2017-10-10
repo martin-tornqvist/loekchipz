@@ -11,6 +11,7 @@ mod entity;
 mod game;
 mod map;
 mod io;
+mod gui;
 mod frobs; // *** ONLY FOR DEMO PURPOSES - TO BE REMOVED ***
 
 extern crate json;
@@ -31,7 +32,7 @@ pub fn main()
 
     let mut states = States::new();
 
-    states.push(Box::new(MainMenuState {}));
+    states.push(Box::new(MainMenuState::new()));
 
     'state_loop: loop
     {

@@ -1,9 +1,32 @@
 use game::GameState;
+use geometry::*;
+use gui::*;
 use io::*;
 use states::*;
 
 #[allow(dead_code)]
-pub struct MainMenuState {}
+pub struct MainMenuState
+{
+    // *** ONLY FOR DEMO PURPOSES - IMPLEMENT A BETTER SETUP ***
+    new_game_button: Button,
+}
+
+impl MainMenuState
+{
+    pub fn new() -> MainMenuState
+    {
+        MainMenuState {
+            // *** ONLY FOR DEMO PURPOSES - IMPLEMENT A BETTER SETUP ***
+            new_game_button: Button::new(
+                R {
+                    p0: P { x: 128, y: 128 },
+                    p1: P { x: 256, y: 192 },
+                },
+                "New game",
+            ),
+        }
+    }
+}
 
 impl State for MainMenuState
 {
@@ -27,24 +50,28 @@ impl State for MainMenuState
 
     fn draw(&mut self, io: &mut Io)
     {
-        let mut msg = String::default();
+        // *** ONLY FOR DEMO PURPOSES - IMPLEMENT A BETTER SETUP ***
+        io.draw_text(
+            "This is the main menu.",
+            64,
+            64,
+            TextAnchorX::Left,
+            TextAnchorY::Top,
+        );
 
-        msg += "This is the main menu.\n\n";
-
-        msg += "Wow, this is an ugly font!\n\n";
-
-        msg += " * Press 'n' to continue.\n";
-        msg += " * Press 'esc' to quit.";
-
-        io.draw_text(&msg, 0, 0);
+        // *** ONLY FOR DEMO PURPOSES - IMPLEMENT A BETTER SETUP ***
+        self.new_game_button.draw(io);
     }
 
     fn update(&mut self, io: &mut Io) -> Vec<StateSignal>
     {
         let d = io.read();
 
+        // *** ONLY FOR DEMO PURPOSES - IMPLEMENT A BETTER SETUP ***
+        self.new_game_button.update(&d);
+
         // Proceed to game state?
-        if d.char == 'n'
+        if self.new_game_button.is_triggered || d.char == 'n'
         {
             let game_state = Box::new(GameState::new());
 

@@ -1,9 +1,10 @@
 extern crate sfml;
 
 use self::sfml::graphics::{Color, RenderTarget, RenderWindow, Sprite, Texture,
-                           Transformable, IntRect, Font, Text};
+                           Transformable, IntRect, Font, Text, Shape,
+                           RectangleShape};
 use self::sfml::window::{ContextSettings, VideoMode, style, Event,
-                         Key as SfmlKey};
+                         Key as SfmlKey, mouse};
 use geometry::*;
 use std::error::Error;
 use std::fs::File;
@@ -17,6 +18,11 @@ pub struct InputData
 {
     pub char: char,
     pub key: Key,
+    pub mouse_pos: P,
+    pub mouse_left_pressed: bool,
+    pub mouse_left_released: bool,
+    pub mouse_right_pressed: bool,
+    pub mouse_right_released: bool,
 }
 
 impl InputData
@@ -26,6 +32,11 @@ impl InputData
         InputData {
             char: 0 as char,
             key: Key::Undefined,
+            mouse_pos: P::default(),
+            mouse_left_pressed: false,
+            mouse_left_released: false,
+            mouse_right_pressed: false,
+            mouse_right_released: false,
         }
     }
 }
@@ -40,6 +51,28 @@ pub struct Io
     font: Font,
 }
 
+// -----------------------------------------------------------------------------
+// Text drawing parameters
+// -----------------------------------------------------------------------------
+#[allow(dead_code)]
+pub enum TextAnchorX
+{
+    Left,
+    Mid,
+    Right,
+}
+
+#[allow(dead_code)]
+pub enum TextAnchorY
+{
+    Top,
+    Mid,
+    Bottom,
+}
+
+// -----------------------------------------------------------------------------
+// IO struct responsible for all input/output handling
+// -----------------------------------------------------------------------------
 impl Io
 {
     pub fn new() -> Io
@@ -67,7 +100,7 @@ impl Io
 
         let texture = Texture::from_file("gfx/tile_sheet.png").unwrap();
 
-        let font = Font::from_file("font/alagard.ttf").unwrap();
+        let font = Font::from_file("font/FreePixel.ttf").unwrap();
 
         Io {
             window: window,
@@ -97,27 +130,83 @@ impl Io
         self.window.draw(&spr);
     }
 
-    pub fn draw_text(&mut self, str: &str, x: i32, y: i32)
+    pub fn draw_text(
+        &mut self,
+        str: &str,
+        x: i32,
+        y: i32,
+        anchor_x: TextAnchorX,
+        anchor_y: TextAnchorY,
+    )
     {
         let mut text = Text::new();
 
         text.set_font(&self.font);
 
-        text.set_character_size(40);
-
-        text.set_position2f(x as f32, y as f32);
-
-        // text.set_fill_color(&Color::white());
+        text.set_character_size(16);
 
         text.set_string(str);
+
+        let text_rect = text.local_bounds();
+
+        let text_w = text_rect.width;
+        let text_h = text_rect.height;
+
+        let mut origin_x = text_rect.left;
+        let mut origin_y = text_rect.top;
+
+        match anchor_x
+        {
+            TextAnchorX::Left => origin_x += 0.0,
+            TextAnchorX::Mid => origin_x += text_w / 2.0,
+            TextAnchorX::Right => origin_x += text_w,
+        }
+
+        match anchor_y
+        {
+            TextAnchorY::Top => origin_y += 0.0,
+            TextAnchorY::Mid => origin_y += text_h / 2.0,
+            TextAnchorY::Bottom => origin_y += text_h,
+        }
+
+        origin_x = origin_x.round();
+        origin_y = origin_y.round();
+
+        text.set_origin2f(origin_x, origin_y);
+
+        text.set_position2f(x as f32, y as f32);
 
         self.window.draw(&text);
     }
 
-    #[allow(dead_code)]
-    pub fn draw_text_p(&mut self, str: &str, p: P)
+    pub fn draw_text_p(
+        &mut self,
+        str: &str,
+        p: P,
+        anchor_x: TextAnchorX,
+        anchor_y: TextAnchorY,
+    )
     {
-        self.draw_text(str, p.x, p.y);
+        self.draw_text(str, p.x, p.y, anchor_x, anchor_y);
+    }
+
+    pub fn draw_rect(&mut self, r: R)
+    {
+        let mut rect = RectangleShape::new();
+
+        rect.set_size2f(r.w() as f32, r.h() as f32);
+
+        rect.set_origin2f(0.0, 0.0);
+
+        rect.set_position2f(r.p0.x as f32, r.p0.y as f32);
+
+        rect.set_outline_thickness(1.0);
+
+        rect.set_outline_color(&Color::white());
+
+        rect.set_fill_color(&Color::rgb(64, 64, 64));
+
+        self.window.draw(&rect);
     }
 
     pub fn read(&mut self) -> InputData
@@ -166,6 +255,34 @@ impl Io
                             {}
                         }
                     }
+                }
+                Event::MouseButtonPressed { button, x, y } =>
+                {
+                    d.mouse_pos = P { x: x, y: y };
+
+                    match button
+                    {
+                        mouse::Button::Left => d.mouse_left_pressed = true,
+                        mouse::Button::Right => d.mouse_right_pressed = true,
+                        _ =>
+                        {}
+                    }
+                }
+                Event::MouseButtonReleased { button, x, y } =>
+                {
+                    d.mouse_pos = P { x: x, y: y };
+
+                    match button
+                    {
+                        mouse::Button::Left => d.mouse_left_pressed = true,
+                        mouse::Button::Right => d.mouse_right_pressed = true,
+                        _ =>
+                        {}
+                    }
+                }
+                Event::MouseMoved { x, y } =>
+                {
+                    d.mouse_pos = P { x: x, y: y };
                 }
                 _ =>
                 {}
