@@ -1,49 +1,102 @@
-use geometry::Dir;
-use geometry::P;
+use io::Io;
 
-#[allow(dead_code)]
-pub struct Entity
+// -----------------------------------------------------------------------------
+// Component trait
+// -----------------------------------------------------------------------------
+pub trait Comp
 {
-    pos: P,
-    is_blocking: bool,
-    tiletype: i32,
-    name: String,
+    fn prepare(&mut self, ent: &Ent, world: &World);
+
+    fn run(&mut self, ent: &Ent, world: &World);
+
+    fn draw(&self, io: &mut Io);
 }
 
-impl Entity
+// -----------------------------------------------------------------------------
+// Entity - carries components
+// -----------------------------------------------------------------------------
+pub struct Ent
 {
-    pub fn new(pos: P, is_blocking: bool, tiletype: i32, name: String)
-        -> Entity
+    pub comps: Vec<Box<Comp>>,
+}
+
+impl Ent
+{
+    pub fn new() -> Ent
     {
-        Entity {
-            pos: pos,
-            is_blocking: is_blocking,
-            tiletype: tiletype,
-            name: name,
-        }
+        Ent { comps: vec![] }
     }
 
-    #[allow(dead_code)]
-    pub fn move_pos(&mut self, p: P)
+    pub fn add_comp(&mut self, comp: Box<Comp>)
     {
-        self.pos = p;
-    }
-
-    #[allow(dead_code)]
-    pub fn move_dir(&mut self, _: Dir)
-    {
-        // ...
-    }
-
-    #[allow(dead_code)]
-    pub fn get_pos(&self) -> P
-    {
-        return self.pos;
-    }
-
-    #[allow(dead_code)]
-    pub fn get_tile_type(&self) -> i32
-    {
-        return self.tiletype;
+        self.comps.push(comp);
     }
 }
+
+// -----------------------------------------------------------------------------
+// World - carries entities (this could be for the map, for a battle, ...)
+// -----------------------------------------------------------------------------
+pub struct World
+{
+    pub ents: Vec<Ent>,
+}
+
+impl World
+{
+    pub fn new() -> World
+    {
+        World { ents: vec![] }
+    }
+
+    pub fn push_ent(&mut self, ent: Ent)
+    {
+        self.ents.push(ent);
+    }
+}
+
+// #[allow(dead_code)]
+// pub struct Entity
+// {
+//     pos: P,
+//     is_blocking: bool,
+//     tiletype: i32,
+//     name: String,
+// }
+
+// impl Entity
+// {
+//     pub fn new(pos: P, is_blocking: bool, tiletype: i32, name: String)
+//         -> Entity
+//     {
+//         Entity {
+//             pos: pos,
+//             is_blocking: is_blocking,
+//             tiletype: tiletype,
+//             name: name,
+//         }
+//     }
+
+//     #[allow(dead_code)]
+//     pub fn move_pos(&mut self, p: P)
+//     {
+//         self.pos = p;
+//     }
+
+//     #[allow(dead_code)]
+//     pub fn move_dir(&mut self, _: Dir)
+//     {
+//         // ...
+//     }
+
+//     #[allow(dead_code)]
+//     pub fn get_pos(&self) -> P
+//     {
+//         return self.pos;
+//     }
+
+//     #[allow(dead_code)]
+//     pub fn get_tile_type(&self) -> i32
+//     {
+//         return self.tiletype;
+//     }
+// }

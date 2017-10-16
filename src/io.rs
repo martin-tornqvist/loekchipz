@@ -44,6 +44,7 @@ impl InputData
 // -----------------------------------------------------------------------------
 // Public struct handling drawing and user input (wraps SFML)
 // -----------------------------------------------------------------------------
+#[allow(dead_code)]
 pub struct Io
 {
     window: RenderWindow,
@@ -129,6 +130,7 @@ impl Io
     }
 
     // TODO: Draw what? /Martin
+    #[allow(dead_code)]
     pub fn draw(&mut self, src: R, dst: R)
     {
         let mut spr = Sprite::new();

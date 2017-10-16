@@ -12,7 +12,7 @@ pub struct Button
 {
     px_coords: R,
     text: String,
-    pub is_pressed: bool,
+    is_pressed: bool,
     pub is_triggered: bool,
 }
 

@@ -9,7 +9,7 @@ mod pathfind;
 mod main_menu;
 mod entity;
 mod game;
-mod map;
+// mod map;
 mod io;
 mod gui;
 mod frobs; // *** ONLY FOR DEMO PURPOSES - TO BE REMOVED ***
