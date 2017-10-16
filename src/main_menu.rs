@@ -55,6 +55,7 @@ impl State for MainMenuState
             "This is the main menu.",
             64,
             64,
+            TextSize::Big,
             TextAnchorX::Left,
             TextAnchorY::Top,
         );

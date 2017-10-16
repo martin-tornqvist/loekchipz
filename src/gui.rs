@@ -52,6 +52,7 @@ impl GuiElement for Button
         io.draw_text_p(
             &self.text,
             self.px_coords.center(),
+            TextSize::Big,
             TextAnchorX::Mid,
             TextAnchorY::Mid,
         );

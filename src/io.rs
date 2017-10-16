@@ -55,6 +55,13 @@ pub struct Io
 // Text drawing parameters
 // -----------------------------------------------------------------------------
 #[allow(dead_code)]
+pub enum TextSize
+{
+    Small,
+    Big,
+}
+
+#[allow(dead_code)]
 pub enum TextAnchorX
 {
     Left,
@@ -100,7 +107,7 @@ impl Io
 
         let texture = Texture::from_file("gfx/tile_sheet.png").unwrap();
 
-        let font = Font::from_file("font/FreePixel.ttf").unwrap();
+        let font = Font::from_file("font/DejaVuSans.ttf").unwrap();
 
         Io {
             window: window,
@@ -111,7 +118,9 @@ impl Io
 
     pub fn clear_screen(&mut self)
     {
-        self.window.clear(&Color::rgb(0, 0, 0));
+        self.window.clear(
+            &Color::rgb(10, 10, 10),
+        );
     }
 
     pub fn update_screen(&mut self)
@@ -135,6 +144,7 @@ impl Io
         str: &str,
         x: i32,
         y: i32,
+        size: TextSize,
         anchor_x: TextAnchorX,
         anchor_y: TextAnchorY,
     )
@@ -143,7 +153,13 @@ impl Io
 
         text.set_font(&self.font);
 
-        text.set_character_size(16);
+        let text_size = match size
+        {
+            TextSize::Small => 12,
+            TextSize::Big => 16,
+        };
+
+        text.set_character_size(text_size);
 
         text.set_string(str);
 
@@ -183,11 +199,12 @@ impl Io
         &mut self,
         str: &str,
         p: P,
+        text_size: TextSize,
         anchor_x: TextAnchorX,
         anchor_y: TextAnchorY,
     )
     {
-        self.draw_text(str, p.x, p.y, anchor_x, anchor_y);
+        self.draw_text(str, p.x, p.y, text_size, anchor_x, anchor_y);
     }
 
     pub fn draw_rect(&mut self, r: R)
