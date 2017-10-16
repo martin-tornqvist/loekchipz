@@ -18,8 +18,25 @@ pub struct Button
 
 impl Button
 {
-    pub fn new(px_coords: R, text: &str) -> Button
+    pub fn new_wide(px_pos: P, text: &str) -> Button
     {
+        let w = 160;
+        let h = 32;
+
+        let w_half = w / 2;
+        let h_half = h / 2;
+
+        let px_coords = R {
+            p0: P {
+                x: px_pos.x - w_half,
+                y: px_pos.y - h_half,
+            },
+            p1: P {
+                x: px_pos.x + w_half,
+                y: px_pos.y + h_half,
+            },
+        };
+
         Button {
             px_coords: px_coords,
             text: String::from(text),

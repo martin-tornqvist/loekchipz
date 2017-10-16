@@ -16,14 +16,7 @@ impl MainMenuState
     pub fn new() -> MainMenuState
     {
         MainMenuState {
-            // *** ONLY FOR DEMO PURPOSES - IMPLEMENT A BETTER SETUP ***
-            new_game_button: Button::new(
-                R {
-                    p0: P { x: 128, y: 128 },
-                    p1: P { x: 256, y: 192 },
-                },
-                "New game",
-            ),
+            new_game_button: Button::new_wide(P { x: 300, y: 128 }, "New game"),
         }
     }
 }
