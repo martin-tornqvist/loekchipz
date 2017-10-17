@@ -1,73 +1,74 @@
 use entity::*;
 use io::*;
 use states::*;
+use std::collections::HashMap;
 
 // -----------------------------------------------------------------------------
 // Demo component
 // -----------------------------------------------------------------------------
-struct DemoComp
+struct DemoPosComp
 {
     x: i32,
+}
+
+impl DemoPosComp
+{
+    fn new() -> DemoPosComp
+    {
+        DemoPosComp { x: 11 }
+    }
+}
+
+impl Comp for DemoPosComp
+{
+    fn prepare(&mut self, ent: &Ent, world: &World)
+    {
+        log!("Entity id: {}", ent.id());
+
+        // TODO: Fetch from world
+        let dx = 1;
+
+        log!("dx: {}", dx);
+    }
+
+    fn operate(&mut self, ent: &Ent, world: &World)
+    {
+        // TODO: Fetch from world
+        let dx = 1;
+
+        self.x += dx;
+
+        log!("x: {}", self.x);
+    }
+}
+
+struct DemoVelComp
+{
     dx: i32,
 }
 
-impl DemoComp
+impl DemoVelComp
 {
-    fn new() -> DemoComp
+    fn new() -> DemoVelComp
     {
-        DemoComp { x: 11, dx: 0 }
+        DemoVelComp { dx: 0 }
     }
 }
 
-impl Comp for DemoComp
+impl Comp for DemoVelComp
 {
-    fn prepare(&mut self, _: &Ent, _: &World)
+    fn prepare(&mut self, ent: &Ent, world: &World)
     {
-        self.dx = 0;
+        log!("Entity id: {}", ent.id());
 
-        if self.x < 19
-        {
-            self.dx = 1;
-        }
+        self.dx = 1;
+
+        log!("dx: {}", self.dx);
     }
 
-    fn run(&mut self, _: &Ent, _: &World)
+    fn operate(&mut self, ent: &Ent, world: &World)
     {
-        self.x += self.dx;
-    }
 
-    fn draw(&self, io: &mut Io)
-    {
-        let w = 16;
-
-        let y = 128;
-
-        io.draw_text(
-            "[",
-            w * 10,
-            y,
-            TextSize::Big,
-            TextAnchorX::Left,
-            TextAnchorY::Top,
-        );
-
-        io.draw_text(
-            "X",
-            w * self.x,
-            y,
-            TextSize::Big,
-            TextAnchorX::Left,
-            TextAnchorY::Top,
-        );
-
-        io.draw_text(
-            "]",
-            w * 20,
-            y,
-            TextSize::Big,
-            TextAnchorX::Left,
-            TextAnchorY::Top,
-        );
     }
 }
 
@@ -76,6 +77,8 @@ impl Comp for DemoComp
 // -----------------------------------------------------------------------------
 pub struct GameState
 {
+    comp_nodes: HashMap<i32, CompNode>,
+    ents: HashMap<i32, Ent>,
     world: World,
 }
 
@@ -83,7 +86,11 @@ impl GameState
 {
     pub fn new() -> GameState
     {
-        GameState { world: World::new() }
+        GameState {
+            comp_nodes: HashMap::new(),
+            ents: HashMap::new(),
+            world: World::new(),
+        }
     }
 } // impl GameState
 
@@ -100,13 +107,25 @@ impl State for GameState
 
     fn on_start(&mut self) -> Vec<StateSignal>
     {
-        let demo_comp = Box::new(DemoComp::new());
+        let demo_ent = Ent::new(42);
 
-        let mut demo_ent = Ent::new();
+        let demo_pos_comp_node =
+            CompNode::new(1337, 42, Box::new(DemoPosComp::new()));
 
-        demo_ent.add_comp(demo_comp);
+        let demo_vel_comp_node =
+            CompNode::new(666, 42, Box::new(DemoPosComp::new()));
 
-        self.world.push_ent(demo_ent);
+        self.ents.insert(42, demo_ent);
+
+        self.comp_nodes.insert(
+            1337,
+            demo_pos_comp_node,
+        );
+
+        self.comp_nodes.insert(
+            666,
+            demo_vel_comp_node,
+        );
 
         return Vec::new();
     }
@@ -125,15 +144,6 @@ impl State for GameState
             TextAnchorX::Left,
             TextAnchorY::Top,
         );
-
-        // Draw
-        for ent in &mut self.world.ents
-        {
-            for comp in &mut ent.comps
-            {
-                comp.draw(io);
-            }
-        }
     }
 
     fn update(&mut self, io: &mut Io) -> Vec<StateSignal>
@@ -148,21 +158,27 @@ impl State for GameState
         if d.char == 'n'
         {
             // Prepare
-            for ent in &mut self.world.ents
+            for (_, comp_node) in self.comp_nodes.iter_mut()
             {
-                for comp in &mut ent.comps
-                {
-                    comp.prepare(ent, &self.world);
-                }
+                let ent: &Ent = self.ents
+                    .get(&comp_node.ent_id())
+                    .unwrap();
+
+                comp_node.comp.prepare(ent, &self.world);
+
+                // TODO: Update world
             }
 
             // Operate
-            for ent in &mut self.world.ents
+            for (_, comp_node) in self.comp_nodes.iter_mut()
             {
-                for comp in &mut ent.comps
-                {
-                    comp.run(ent, &self.world);
-                }
+                let ent: &Ent = self.ents
+                    .get(&comp_node.ent_id())
+                    .unwrap();
+
+                comp_node.comp.operate(ent, &self.world);
+
+                // TODO: Update world
             }
         }
 

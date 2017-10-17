@@ -1,56 +1,80 @@
 use io::Io;
+use std::collections::HashMap;
 
 // -----------------------------------------------------------------------------
-// Component trait
+// Component
 // -----------------------------------------------------------------------------
+pub struct CompNode
+{
+    id: i32,
+    ent_id: i32,
+    pub comp: Box<Comp>,
+}
+
+impl CompNode
+{
+    pub fn new(id: i32, ent_id: i32, comp: Box<Comp>) -> CompNode
+    {
+        CompNode {
+            id: id,
+            ent_id: ent_id,
+            comp: comp,
+        }
+    }
+
+    pub fn id(&self) -> i32
+    {
+        return self.id;
+    }
+
+    pub fn ent_id(&self) -> i32
+    {
+        return self.ent_id;
+    }
+}
+
 pub trait Comp
 {
     fn prepare(&mut self, ent: &Ent, world: &World);
 
-    fn run(&mut self, ent: &Ent, world: &World);
-
-    fn draw(&self, io: &mut Io);
+    fn operate(&mut self, ent: &Ent, world: &World);
 }
 
 // -----------------------------------------------------------------------------
-// Entity - carries components
+// Entity
 // -----------------------------------------------------------------------------
 pub struct Ent
 {
-    pub comps: Vec<Box<Comp>>,
+    id: i32,
+    comp_ids: Vec<i32>,
 }
 
 impl Ent
 {
-    pub fn new() -> Ent
+    pub fn new(id: i32) -> Ent
     {
-        Ent { comps: vec![] }
+        Ent {
+            id: id,
+            comp_ids: vec![],
+        }
     }
 
-    pub fn add_comp(&mut self, comp: Box<Comp>)
+    pub fn id(&self) -> i32
     {
-        self.comps.push(comp);
+        return self.id;
     }
 }
 
 // -----------------------------------------------------------------------------
-// World - carries entities (this could be for the map, for a battle, ...)
+// World
 // -----------------------------------------------------------------------------
-pub struct World
-{
-    pub ents: Vec<Ent>,
-}
+pub struct World {}
 
 impl World
 {
     pub fn new() -> World
     {
-        World { ents: vec![] }
-    }
-
-    pub fn push_ent(&mut self, ent: Ent)
-    {
-        self.ents.push(ent);
+        World {}
     }
 }
 
