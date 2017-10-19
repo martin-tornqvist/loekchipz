@@ -1,74 +1,48 @@
 use entity::*;
 use io::*;
 use states::*;
-use std::collections::HashMap;
 
 // -----------------------------------------------------------------------------
 // Demo component
 // -----------------------------------------------------------------------------
-struct DemoPosComp
+fn operate_pos(data: &mut Data, ent: &Ent, _: &World)
 {
-    x: i32,
-}
+    log!("Entity id: {}", ent.id());
 
-impl DemoPosComp
-{
-    fn new() -> DemoPosComp
+    for comp in &ent.comps
     {
-        DemoPosComp { x: 11 }
+        match comp.data
+        {
+            Data::DemoDelta { dx } =>
+            {
+                match data
+                {
+                    &mut Data::DemoPos { ref mut x, .. } =>
+                    {
+                        *x += dx;
+                    }
+                    _ =>
+                    {}
+                }
+            }
+            _ =>
+            {}
+        }
     }
 }
 
-impl Comp for DemoPosComp
+fn prepare_delta(data: &mut Data, ent: &Ent, _: &World)
 {
-    fn prepare(&mut self, ent: &Ent, world: &World)
+    log!("Entity id: {}", ent.id());
+
+    match data
     {
-        log!("Entity id: {}", ent.id());
-
-        // TODO: Fetch from world
-        let dx = 1;
-
-        log!("dx: {}", dx);
-    }
-
-    fn operate(&mut self, ent: &Ent, world: &World)
-    {
-        // TODO: Fetch from world
-        let dx = 1;
-
-        self.x += dx;
-
-        log!("x: {}", self.x);
-    }
-}
-
-struct DemoVelComp
-{
-    dx: i32,
-}
-
-impl DemoVelComp
-{
-    fn new() -> DemoVelComp
-    {
-        DemoVelComp { dx: 0 }
-    }
-}
-
-impl Comp for DemoVelComp
-{
-    fn prepare(&mut self, ent: &Ent, world: &World)
-    {
-        log!("Entity id: {}", ent.id());
-
-        self.dx = 1;
-
-        log!("dx: {}", self.dx);
-    }
-
-    fn operate(&mut self, ent: &Ent, world: &World)
-    {
-
+        &mut Data::DemoDelta { ref mut dx } =>
+        {
+            *dx = 1;
+        }
+        _ =>
+        {}
     }
 }
 
@@ -77,8 +51,6 @@ impl Comp for DemoVelComp
 // -----------------------------------------------------------------------------
 pub struct GameState
 {
-    comp_nodes: HashMap<i32, CompNode>,
-    ents: HashMap<i32, Ent>,
     world: World,
 }
 
@@ -86,11 +58,7 @@ impl GameState
 {
     pub fn new() -> GameState
     {
-        GameState {
-            comp_nodes: HashMap::new(),
-            ents: HashMap::new(),
-            world: World::new(),
-        }
+        GameState { world: World::new() }
     }
 } // impl GameState
 
@@ -107,25 +75,33 @@ impl State for GameState
 
     fn on_start(&mut self) -> Vec<StateSignal>
     {
-        let demo_ent = Ent::new(42);
+        let mut demo_ent = Ent::new(42);
 
-        let demo_pos_comp_node =
-            CompNode::new(1337, 42, Box::new(DemoPosComp::new()));
-
-        let demo_vel_comp_node =
-            CompNode::new(666, 42, Box::new(DemoPosComp::new()));
-
-        self.ents.insert(42, demo_ent);
-
-        self.comp_nodes.insert(
+        let demo_pos_comp = Comp::new(
             1337,
-            demo_pos_comp_node,
+            42,
+            Data::DemoPos {
+                is_frob: false,
+                x: 0,
+                nr_bars: 9001,
+            },
+            None,
+            Some(operate_pos),
         );
 
-        self.comp_nodes.insert(
+        let demo_delta_comp = Comp::new(
             666,
-            demo_vel_comp_node,
+            42,
+            Data::DemoDelta { dx: 0 },
+            Some(prepare_delta),
+            None,
         );
+
+        demo_ent.comps.push(demo_pos_comp);
+
+        demo_ent.comps.push(demo_delta_comp);
+
+        self.world.ents.push(demo_ent);
 
         return Vec::new();
     }
@@ -158,27 +134,31 @@ impl State for GameState
         if d.char == 'n'
         {
             // Prepare
-            for (_, comp_node) in self.comp_nodes.iter_mut()
+            for ent_idx in 0..self.world.ents.len()
             {
-                let ent: &Ent = self.ents
-                    .get(&comp_node.ent_id())
-                    .unwrap();
+                for comp_idx in 0..self.world.ents[ent_idx].comps.len()
+                {
+                    if self.world.ents[ent_idx].comps[comp_idx]
+                        .prepare
+                        .is_none()
+                    {
+                        continue;
+                    }
 
-                comp_node.comp.prepare(ent, &self.world);
+                    let mut data = self.world.ents[ent_idx].comps[comp_idx]
+                        .data
+                        .clone();
 
-                // TODO: Update world
-            }
+                    self.world.ents[ent_idx].comps[comp_idx]
+                        .prepare
+                        .unwrap()(
+                        &mut data,
+                        &self.world.ents[ent_idx],
+                        &self.world,
+                    );
 
-            // Operate
-            for (_, comp_node) in self.comp_nodes.iter_mut()
-            {
-                let ent: &Ent = self.ents
-                    .get(&comp_node.ent_id())
-                    .unwrap();
-
-                comp_node.comp.operate(ent, &self.world);
-
-                // TODO: Update world
+                    self.world.ents[ent_idx].comps[comp_idx].data = data;
+                }
             }
         }
 
@@ -187,6 +167,5 @@ impl State for GameState
 
     fn on_popped(&mut self)
     {
-
     }
 } // impl State for GameState

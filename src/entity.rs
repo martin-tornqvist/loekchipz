@@ -1,44 +1,73 @@
-use io::Io;
-use std::collections::HashMap;
+// -----------------------------------------------------------------------------
+// Component data --- TODO: Move to own file
+// -----------------------------------------------------------------------------
+#[derive(Clone, PartialEq)]
+pub enum Data
+{
+    DemoPos
+    { is_frob: bool, x: i32, nr_bars: i32 },
+
+    DemoDelta
+    { dx: i32 },
+}
 
 // -----------------------------------------------------------------------------
 // Component
 // -----------------------------------------------------------------------------
-pub struct CompNode
+#[allow(dead_code)]
+pub struct Comp
 {
     id: i32,
     ent_id: i32,
-    pub comp: Box<Comp>,
+    pub data: Data,
+    pub prepare: Option<fn(data: &mut Data, ent: &Ent, world: &World)>,
+    pub operate: Option<fn(data: &mut Data, ent: &Ent, world: &World)>,
 }
 
-impl CompNode
+impl Comp
 {
-    pub fn new(id: i32, ent_id: i32, comp: Box<Comp>) -> CompNode
+    pub fn new(
+        id: i32,
+        ent_id: i32,
+        data: Data,
+        prepare: Option<fn(data: &mut Data, ent: &Ent, world: &World)>,
+        operate: Option<fn(data: &mut Data, ent: &Ent, world: &World)>,
+    ) -> Comp
     {
-        CompNode {
+        Comp {
             id: id,
             ent_id: ent_id,
-            comp: comp,
+            data: data,
+            prepare: prepare,
+            operate: operate,
         }
     }
 
+    #[allow(dead_code)]
     pub fn id(&self) -> i32
     {
         return self.id;
     }
 
+    #[allow(dead_code)]
     pub fn ent_id(&self) -> i32
     {
         return self.ent_id;
     }
 }
 
-pub trait Comp
-{
-    fn prepare(&mut self, ent: &Ent, world: &World);
+// pub trait Comp
+// {
+//     fn prepare(&self, ent: &Ent, world: &World) -> Option<Box<Comp>>
+//     {
+//         return None
+//     }
 
-    fn operate(&mut self, ent: &Ent, world: &World);
-}
+//     fn operate(&self, ent: &Ent, world: &World) -> Option<Box<Comp>>
+//     {
+//         return None
+//     }
+// }
 
 // -----------------------------------------------------------------------------
 // Entity
@@ -46,7 +75,7 @@ pub trait Comp
 pub struct Ent
 {
     id: i32,
-    comp_ids: Vec<i32>,
+    pub comps: Vec<Comp>,
 }
 
 impl Ent
@@ -55,7 +84,7 @@ impl Ent
     {
         Ent {
             id: id,
-            comp_ids: vec![],
+            comps: vec![],
         }
     }
 
@@ -68,13 +97,16 @@ impl Ent
 // -----------------------------------------------------------------------------
 // World
 // -----------------------------------------------------------------------------
-pub struct World {}
+pub struct World
+{
+    pub ents: Vec<Ent>,
+}
 
 impl World
 {
     pub fn new() -> World
     {
-        World {}
+        World { ents: vec![] }
     }
 }
 
