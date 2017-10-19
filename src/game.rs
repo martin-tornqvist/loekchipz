@@ -1,75 +1,23 @@
 use entity::*;
+use geometry::*;
 use io::*;
 use states::*;
-use std::collections::HashMap;
 
 // -----------------------------------------------------------------------------
-// Demo component
+// Demo agent functions
 // -----------------------------------------------------------------------------
-struct DemoPosComp
+fn army_move_east(agent: &Agent, world: &mut World)
 {
-    x: i32,
+    let army = world.find_army(agent.ent_id()).unwrap();
+
+    army.data.pos.offset_dir(Dir::Right);
 }
 
-impl DemoPosComp
+fn army_move_south(agent: &Agent, world: &mut World)
 {
-    fn new() -> DemoPosComp
-    {
-        DemoPosComp { x: 11 }
-    }
-}
+    let army = world.find_army(agent.ent_id()).unwrap();
 
-impl Comp for DemoPosComp
-{
-    fn prepare(&mut self, ent: &Ent, world: &World)
-    {
-        log!("Entity id: {}", ent.id());
-
-        // TODO: Fetch from world
-        let dx = 1;
-
-        log!("dx: {}", dx);
-    }
-
-    fn operate(&mut self, ent: &Ent, world: &World)
-    {
-        // TODO: Fetch from world
-        let dx = 1;
-
-        self.x += dx;
-
-        log!("x: {}", self.x);
-    }
-}
-
-struct DemoVelComp
-{
-    dx: i32,
-}
-
-impl DemoVelComp
-{
-    fn new() -> DemoVelComp
-    {
-        DemoVelComp { dx: 0 }
-    }
-}
-
-impl Comp for DemoVelComp
-{
-    fn prepare(&mut self, ent: &Ent, world: &World)
-    {
-        log!("Entity id: {}", ent.id());
-
-        self.dx = 1;
-
-        log!("dx: {}", self.dx);
-    }
-
-    fn operate(&mut self, ent: &Ent, world: &World)
-    {
-
-    }
+    army.data.pos.offset_dir(Dir::Down);
 }
 
 // -----------------------------------------------------------------------------
@@ -77,9 +25,8 @@ impl Comp for DemoVelComp
 // -----------------------------------------------------------------------------
 pub struct GameState
 {
-    comp_nodes: HashMap<i32, CompNode>,
-    ents: HashMap<i32, Ent>,
     world: World,
+    agents: Vec<Agent>,
 }
 
 impl GameState
@@ -87,9 +34,8 @@ impl GameState
     pub fn new() -> GameState
     {
         GameState {
-            comp_nodes: HashMap::new(),
-            ents: HashMap::new(),
             world: World::new(),
+            agents: vec![],
         }
     }
 } // impl GameState
@@ -107,25 +53,33 @@ impl State for GameState
 
     fn on_start(&mut self) -> Vec<StateSignal>
     {
-        let demo_ent = Ent::new(42);
+        // TODO: The IDs here will be handled by some kind of allocator object
 
-        let demo_pos_comp_node =
-            CompNode::new(1337, 42, Box::new(DemoPosComp::new()));
+        self.world.armies.push(Ent::new(
+            42,
+            ArmyData {
+                pos: P { x: 18, y: 50 },
+                size: 5000,
+            },
+        ));
 
-        let demo_vel_comp_node =
-            CompNode::new(666, 42, Box::new(DemoPosComp::new()));
+        self.agents.push(Agent::new(
+            42,
+            Some(army_move_east),
+        ));
 
-        self.ents.insert(42, demo_ent);
-
-        self.comp_nodes.insert(
+        self.world.armies.push(Ent::new(
             1337,
-            demo_pos_comp_node,
-        );
+            ArmyData {
+                pos: P { x: 77, y: 9 },
+                size: 8750,
+            },
+        ));
 
-        self.comp_nodes.insert(
-            666,
-            demo_vel_comp_node,
-        );
+        self.agents.push(Agent::new(
+            1337,
+            Some(army_move_south),
+        ));
 
         return Vec::new();
     }
@@ -157,29 +111,31 @@ impl State for GameState
 
         if d.char == 'n'
         {
-            // Prepare
-            for (_, comp_node) in self.comp_nodes.iter_mut()
+            // TODO: Just iterating over the agents for now - but eventually
+            // this will rather be something like:
+            // "For each agent, for each army, for the current team, do actions
+            // until this team has finished its turn"
+            for agent in &self.agents
             {
-                let ent: &Ent = self.ents
-                    .get(&comp_node.ent_id())
-                    .unwrap();
-
-                comp_node.comp.prepare(ent, &self.world);
-
-                // TODO: Update world
+                if agent.act.is_some()
+                {
+                    agent.act.unwrap()(&agent, &mut self.world);
+                }
             }
 
-            // Operate
-            for (_, comp_node) in self.comp_nodes.iter_mut()
-            {
-                let ent: &Ent = self.ents
-                    .get(&comp_node.ent_id())
-                    .unwrap();
+            let army_1 = &self.world.armies[0];
+            let army_2 = &self.world.armies[1];
 
-                comp_node.comp.operate(ent, &self.world);
-
-                // TODO: Update world
-            }
+            log!(
+                "Army 1 position: ({},{})",
+                army_1.data.pos.x,
+                army_1.data.pos.y
+            );
+            log!(
+                "Army 2 position: ({},{})",
+                army_2.data.pos.x,
+                army_2.data.pos.y
+            );
         }
 
         return Vec::new();

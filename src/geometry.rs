@@ -110,32 +110,26 @@ pub struct P
 impl P
 {
     #[allow(dead_code)]
-    fn offset(&self, x: i32, y: i32) -> P
+    pub fn offset(&mut self, dx: i32, dy: i32)
     {
-        P {
-            x: self.x + x,
-            y: self.y + y,
-        }
+        self.x += dx;
+        self.y += dy;
     }
 
     #[allow(dead_code)]
-    fn offset_p(&self, p: Self) -> P
+    pub fn offset_p(&mut self, d: Self)
     {
-        P {
-            x: self.x + p.x,
-            y: self.y + p.y,
-        }
+        self.x += d.x;
+        self.y += d.y;
     }
 
     #[allow(dead_code)]
-    fn offset_dir(&self, dir: Dir) -> P
+    pub fn offset_dir(&mut self, dir: Dir)
     {
-        let p = dir_to_offset(dir);
+        let d = dir_to_offset(dir);
 
-        P {
-            x: self.x + p.x,
-            y: self.y + p.y,
-        }
+        self.x += d.x;
+        self.y += d.y;
     }
 
     #[allow(dead_code)]
