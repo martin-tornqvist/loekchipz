@@ -51,8 +51,7 @@ pub enum Dir
 // -----------------------------------------------------------------------------
 pub fn dir_to_offset(dir: Dir) -> P
 {
-    match dir
-    {
+    match dir {
         Dir::UpLeft => P { x: -1, y: -1 },
         Dir::Up => P { x: 0, y: -1 },
         Dir::UpRight => P { x: 1, y: -1 },
@@ -67,8 +66,7 @@ pub fn dir_to_offset(dir: Dir) -> P
 
 pub fn offset_to_dir(offset: P) -> Dir
 {
-    match offset
-    {
+    match offset {
         P { x: -1, y: -1 } => Dir::UpLeft,
         P { x: 0, y: -1 } => Dir::Up,
         P { x: 1, y: -1 } => Dir::UpRight,
@@ -84,12 +82,9 @@ pub fn offset_to_dir(offset: P) -> Dir
 
 pub fn sign(value: i32) -> i32
 {
-    if value < 0
-    {
+    if value < 0 {
         return -1;
-    }
-    else if value > 0
-    {
+    } else if value > 0 {
         return 1;
     }
 
@@ -110,7 +105,13 @@ pub struct P
 impl P
 {
     #[allow(dead_code)]
-    fn offset(&self, x: i32, y: i32) -> P
+    pub fn new(x: i32, y: i32) -> P
+    {
+        P { x, y }
+    }
+
+    #[allow(dead_code)]
+    pub fn offset(&self, x: i32, y: i32) -> P
     {
         P {
             x: self.x + x,
@@ -119,7 +120,7 @@ impl P
     }
 
     #[allow(dead_code)]
-    fn offset_p(&self, p: Self) -> P
+    pub fn offset_p(&self, p: Self) -> P
     {
         P {
             x: self.x + p.x,
@@ -128,7 +129,7 @@ impl P
     }
 
     #[allow(dead_code)]
-    fn offset_dir(&self, dir: Dir) -> P
+    pub fn offset_dir(&self, dir: Dir) -> P
     {
         let p = dir_to_offset(dir);
 
@@ -140,13 +141,13 @@ impl P
 
     #[allow(dead_code)]
     // NOTE: Assumes that both x and y is -1, 0, or 1
-    fn dir(self) -> Dir
+    pub fn dir(self) -> Dir
     {
         offset_to_dir(self)
     }
 
     #[allow(dead_code)]
-    fn signs(&self) -> P
+    pub fn signs(&self) -> P
     {
         P {
             x: sign(self.x),
@@ -262,6 +263,7 @@ pub const OFFSETS_CARDINAL_FIRST_NO_CENTER: [P; 8] = [
 // Rectangle
 // -----------------------------------------------------------------------------
 #[derive(Copy)]
+#[derive(Debug)]
 pub struct R
 {
     pub p0: P,
@@ -289,7 +291,11 @@ impl PartialEq for R
 
 impl R
 {
-    #[allow(dead_code)]
+    pub fn new(p0: P, p1: P) -> R
+    {
+        R { p0, p1 }
+    }
+
     pub fn is_p_inside(&self, p: P) -> bool
     {
         let x_inside = (p.x >= self.p0.x) && (p.x <= self.p1.x);
@@ -300,7 +306,7 @@ impl R
 
     pub fn w(&self) -> i32
     {
-        return (self.p1.x - self.p0.y) + 1;
+        return (self.p1.x - self.p0.x) + 1;
     }
 
     pub fn h(&self) -> i32

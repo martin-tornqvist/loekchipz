@@ -27,7 +27,7 @@ pub struct InputData
 
 impl InputData
 {
-    fn new() -> InputData
+    pub fn new() -> InputData
     {
         InputData {
             char: 0 as char,
@@ -105,7 +105,7 @@ impl Io
 
         window.set_vertical_sync_enabled(true);
 
-        let texture = Texture::from_file("gfx/tile_sheet.png").unwrap();
+        let texture = Texture::from_file("gfx/tiles.png").unwrap();
 
         let font = Font::from_file("font/DejaVuSans.ttf").unwrap();
 
@@ -128,13 +128,15 @@ impl Io
         self.window.display();
     }
 
-    // TODO: Draw what? /Martin
-    pub fn draw(&mut self, src: R, dst: R)
+    pub fn draw_tile(&mut self, src: P, dst: P)
     {
         let mut spr = Sprite::new();
+
         spr.set_texture(&self.texture, true);
-        spr.set_texture_rect(&IntRect::new(src.p0.x, src.p0.y, 16, 16));
-        spr.set_position2f(dst.p0.x as f32, dst.p0.y as f32);
+
+        spr.set_texture_rect(&IntRect::new(src.x, src.y, 32, 32));
+
+        spr.set_position2f(dst.x as f32, dst.y as f32);
 
         self.window.draw(&spr);
     }
@@ -153,8 +155,7 @@ impl Io
 
         text.set_font(&self.font);
 
-        let text_size = match size
-        {
+        let text_size = match size {
             TextSize::Small => 12,
             TextSize::Big => 16,
         };
@@ -171,15 +172,13 @@ impl Io
         let mut origin_x = text_rect.left;
         let mut origin_y = text_rect.top;
 
-        match anchor_x
-        {
+        match anchor_x {
             TextAnchorX::Left => origin_x += 0.0,
             TextAnchorX::Mid => origin_x += text_w / 2.0,
             TextAnchorX::Right => origin_x += text_w,
         }
 
-        match anchor_y
-        {
+        match anchor_y {
             TextAnchorY::Top => origin_y += 0.0,
             TextAnchorY::Mid => origin_y += text_h / 2.0,
             TextAnchorY::Bottom => origin_y += text_h,
@@ -211,15 +210,15 @@ impl Io
     {
         let mut rect = RectangleShape::new();
 
-        rect.set_size2f(r.w() as f32, r.h() as f32);
-
         rect.set_origin2f(0.0, 0.0);
 
         rect.set_position2f(r.p0.x as f32, r.p0.y as f32);
 
-        rect.set_outline_thickness(1.0);
+        rect.set_size2f(r.w() as f32, r.h() as f32);
 
-        rect.set_outline_color(&Color::white());
+        // rect.set_outline_thickness(1.0);
+
+        // rect.set_outline_color(&Color::rgb(128, 128, 128));
 
         rect.set_fill_color(&Color::rgb(64, 64, 64));
 
@@ -230,79 +229,62 @@ impl Io
     {
         let mut d = InputData::new();
 
-        for event in self.window.events()
-        {
-            match event
-            {
-                Event::KeyPressed { code, .. } =>
-                {
+        for event in self.window.events() {
+            match event {
+                Event::KeyPressed { code, .. } => {
                     // Letters
-                    if (code >= SfmlKey::A) && (code <= SfmlKey::Z)
-                    {
+                    if (code >= SfmlKey::A) && (code <= SfmlKey::Z) {
                         d.char = sfml_key_to_char('a', SfmlKey::A, code);
                         return d;
                     }
                     // Numbers
-                    else if (code >= SfmlKey::Num0) && (code <= SfmlKey::Num9)
+                    else if (code >= SfmlKey::Num0) &&
+                               (code <= SfmlKey::Num9)
                     {
                         d.char = sfml_key_to_char('0', SfmlKey::Num0, code);
                         return d;
                     }
                     // Special keys
-                    else
-                    {
-                        match code
-                        {
-                            SfmlKey::Escape =>
-                            {
+                    else {
+                        match code {
+                            SfmlKey::Escape => {
                                 d.key = Key::Esc;
                                 return d;
                             }
-                            SfmlKey::Space =>
-                            {
+                            SfmlKey::Space => {
                                 d.key = Key::Space;
                                 return d;
                             }
-                            SfmlKey::Return =>
-                            {
+                            SfmlKey::Return => {
                                 d.key = Key::Return;
                                 return d;
                             }
-                            _ =>
-                            {}
+                            _ => {}
                         }
                     }
                 }
-                Event::MouseButtonPressed { button, x, y } =>
-                {
+                Event::MouseButtonPressed { button, x, y } => {
                     d.mouse_pos = P { x: x, y: y };
 
-                    match button
-                    {
+                    match button {
                         mouse::Button::Left => d.mouse_left_pressed = true,
                         mouse::Button::Right => d.mouse_right_pressed = true,
-                        _ =>
-                        {}
+                        _ => {}
                     }
                 }
-                Event::MouseButtonReleased { button, x, y } =>
-                {
+                Event::MouseButtonReleased { button, x, y } => {
                     d.mouse_pos = P { x: x, y: y };
 
-                    match button
-                    {
+                    match button {
                         mouse::Button::Left => d.mouse_left_pressed = true,
                         mouse::Button::Right => d.mouse_right_pressed = true,
-                        _ =>
-                        {}
+                        _ => {}
                     }
                 }
-                Event::MouseMoved { x, y } =>
-                {
+                Event::MouseMoved { x, y } => {
                     d.mouse_pos = P { x: x, y: y };
                 }
-                _ =>
-                {}
+                _ => {}
             }
         }
 
@@ -318,18 +300,15 @@ pub fn file_to_str(path: &Path) -> String
 {
     let path_display = path.display();
 
-    let mut file = match File::open(&path)
-    {
-        Err(why) =>
-        {
+    let mut file = match File::open(&path) {
+        Err(why) => {
             panic!(
                 "Could not open file '{}': {}",
                 path_display,
                 why.description()
             )
         }
-        Ok(file) =>
-        {
+        Ok(file) => {
             log!("Successfully opened file '{}'", path_display);
 
             file
@@ -338,18 +317,15 @@ pub fn file_to_str(path: &Path) -> String
 
     let mut s = String::new();
 
-    match file.read_to_string(&mut s)
-    {
-        Err(why) =>
-        {
+    match file.read_to_string(&mut s) {
+        Err(why) => {
             panic!(
                 "Could not read file '{}': {}",
                 path_display,
                 why.description()
             )
         }
-        Ok(_) =>
-        {
+        Ok(_) => {
             log!("Successfully read file '{}'", path_display);
         }
     }

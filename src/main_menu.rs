@@ -44,6 +44,7 @@ impl State for MainMenuState
     fn draw(&mut self, io: &mut Io)
     {
         // *** ONLY FOR DEMO PURPOSES - IMPLEMENT A BETTER SETUP ***
+
         io.draw_text(
             "This is the main menu.",
             64,
@@ -53,8 +54,11 @@ impl State for MainMenuState
             TextAnchorY::Top,
         );
 
-        // *** ONLY FOR DEMO PURPOSES - IMPLEMENT A BETTER SETUP ***
         self.new_game_button.draw(io);
+
+        io.draw_tile(P::new(0, 0), P::new(32, 400));
+        io.draw_tile(P::new(32, 0), P::new(64, 400));
+        io.draw_tile(P::new(64, 0), P::new(96, 400));
     }
 
     fn update(&mut self, io: &mut Io) -> Vec<StateSignal>
@@ -65,16 +69,14 @@ impl State for MainMenuState
         self.new_game_button.update(&d);
 
         // Proceed to game state?
-        if self.new_game_button.is_triggered || d.char == 'n'
-        {
+        if self.new_game_button.is_triggered || d.char == 'n' {
             let game_state = Box::new(GameState::new());
 
             return vec![StateSignal::Push { state: game_state }];
         }
 
         // Exit game?
-        if d.key == Key::Esc
-        {
+        if d.key == Key::Esc {
             return vec![StateSignal::Pop];
         }
 

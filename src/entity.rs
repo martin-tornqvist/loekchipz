@@ -6,7 +6,7 @@ pub type Id = u32;
 pub struct CompEntry<T>
 {
     pub ent_id: Id,
-    pub comp: T,
+    pub data: T,
 }
 
 impl<T> CompEntry<T>
@@ -14,7 +14,7 @@ impl<T> CompEntry<T>
     pub fn new(ent_id: Id, comp: T) -> CompEntry<T>
     {
         CompEntry {
-            comp: comp,
+            data: comp,
             ent_id: ent_id,
         }
     }
@@ -35,16 +35,9 @@ impl<T> CompRepo<T>
         CompRepo { entries: vec![] }
     }
 
-    pub fn insert(&mut self, ent_id: Id, comp: T)
+    pub fn add(&mut self, ent_id: Id, comp: T)
     {
-        let idx = ent_id as usize;
-
-        if self.entries.len() > idx {
-            return;
-        }
-
-        self.entries.insert(
-            idx,
+        self.entries.push(
             CompEntry::new(ent_id, comp),
         );
     }
@@ -52,6 +45,7 @@ impl<T> CompRepo<T>
     // TODO: implement...
     // pub fn copy_for(&mut self, ent_id: Id) -> T
 
+    #[allow(unused)]
     pub fn get_for(&mut self, ent_id: Id) -> &mut T
     {
         let mut result_idx: usize = 0;
@@ -76,21 +70,23 @@ impl<T> CompRepo<T>
             panic!("Could not find component for entity {}", ent_id);
         }
 
-        return &mut self.entries[result_idx].comp;
+        return &mut self.entries[result_idx].data;
     }
 
     // TODO: implement...
     // pub fn copy_all_for(&mut self, ent_id: Id) -> Vec<&mut T>
 
+    #[allow(unused)]
     pub fn get_all_for(&mut self, ent_id: Id) -> Vec<&mut T>
     {
         self.entries
             .iter_mut()
             .filter(|entry| entry.ent_id == ent_id)
-            .map(|entry| &mut entry.comp)
+            .map(|entry| &mut entry.data)
             .collect()
     }
 
+    #[allow(unused)]
     pub fn contains_for(&self, ent_id: Id) -> bool
     {
         return self.entries
@@ -122,10 +118,5 @@ impl IdGenerator
         self.counter += 1;
 
         return id;
-    }
-
-    pub fn nr_ents(&self) -> u32
-    {
-        return self.counter;
     }
 }
