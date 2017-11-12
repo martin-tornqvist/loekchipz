@@ -1,49 +1,131 @@
-use geometry::Dir;
-use geometry::P;
+pub type Id = u32;
 
-#[allow(dead_code)]
-pub struct Entity
+// -----------------------------------------------------------------------------
+// Component entry - Component + meta data
+// -----------------------------------------------------------------------------
+pub struct CompEntry<T>
 {
-    pos: P,
-    is_blocking: bool,
-    tiletype: i32,
-    name: String,
+    pub ent_id: Id,
+    pub comp: T,
 }
 
-impl Entity
+impl<T> CompEntry<T>
 {
-    pub fn new(pos: P, is_blocking: bool, tiletype: i32, name: String)
-        -> Entity
+    pub fn new(ent_id: Id, comp: T) -> CompEntry<T>
     {
-        Entity {
-            pos: pos,
-            is_blocking: is_blocking,
-            tiletype: tiletype,
-            name: name,
+        CompEntry {
+            comp: comp,
+            ent_id: ent_id,
         }
     }
+}
 
-    #[allow(dead_code)]
-    pub fn move_pos(&mut self, p: P)
+// -----------------------------------------------------------------------------
+// Component repo - generic storage for components of a any type
+// -----------------------------------------------------------------------------
+pub struct CompRepo<T>
+{
+    pub entries: Vec<CompEntry<T>>,
+}
+
+impl<T> CompRepo<T>
+{
+    pub fn new() -> CompRepo<T>
     {
-        self.pos = p;
+        CompRepo { entries: vec![] }
     }
 
-    #[allow(dead_code)]
-    pub fn move_dir(&mut self, _: Dir)
+    pub fn insert(&mut self, ent_id: Id, comp: T)
     {
-        // ...
+        let idx = ent_id as usize;
+
+        if self.entries.len() > idx {
+            return;
+        }
+
+        self.entries.insert(
+            idx,
+            CompEntry::new(ent_id, comp),
+        );
     }
 
-    #[allow(dead_code)]
-    pub fn get_pos(&self) -> P
+    // TODO: implement...
+    // pub fn copy_for(&mut self, ent_id: Id) -> T
+
+    pub fn get_for(&mut self, ent_id: Id) -> &mut T
     {
-        return self.pos;
+        let mut result_idx: usize = 0;
+        let mut found = false;
+
+        for idx in 0..self.entries.len() {
+            let e = &self.entries[idx];
+
+            if e.ent_id != ent_id {
+                continue;
+            }
+
+            if found {
+                panic!("Component found multiple times for entity {}", ent_id);
+            }
+
+            result_idx = idx;
+            found = true;
+        }
+
+        if !found {
+            panic!("Could not find component for entity {}", ent_id);
+        }
+
+        return &mut self.entries[result_idx].comp;
     }
 
-    #[allow(dead_code)]
-    pub fn get_tile_type(&self) -> i32
+    // TODO: implement...
+    // pub fn copy_all_for(&mut self, ent_id: Id) -> Vec<&mut T>
+
+    pub fn get_all_for(&mut self, ent_id: Id) -> Vec<&mut T>
     {
-        return self.tiletype;
+        self.entries
+            .iter_mut()
+            .filter(|entry| entry.ent_id == ent_id)
+            .map(|entry| &mut entry.comp)
+            .collect()
+    }
+
+    pub fn contains_for(&self, ent_id: Id) -> bool
+    {
+        return self.entries
+            .iter()
+            .find(|e| e.ent_id == ent_id)
+            .is_some();
+    }
+}
+
+// -----------------------------------------------------------------------------
+// ID Generator - Creates unique entity id's
+// -----------------------------------------------------------------------------
+pub struct IdGenerator
+{
+    counter: Id,
+}
+
+impl IdGenerator
+{
+    pub fn new() -> IdGenerator
+    {
+        IdGenerator { counter: 0 }
+    }
+
+    pub fn create(&mut self) -> Id
+    {
+        let id = self.counter;
+
+        self.counter += 1;
+
+        return id;
+    }
+
+    pub fn nr_ents(&self) -> u32
+    {
+        return self.counter;
     }
 }
