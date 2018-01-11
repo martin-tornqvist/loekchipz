@@ -147,7 +147,7 @@ mod tests {
 
         let dims = P { x: 100, y: 100 };
 
-        let mut blocked: A2<bool> = A2::new_default(dims);
+        let mut blocked: A2<bool> = A2::new_copied(dims, false);
 
         *blocked.at(51, 74) = true;
         *blocked.at(51, 75) = true;

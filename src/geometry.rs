@@ -373,7 +373,7 @@ impl<T> A2<T>
     #[allow(dead_code)]
     pub fn at_p(&mut self, p: P) -> &mut T
     {
-        let mut v = self.at(p.x, p.y);
+        let v = self.at(p.x, p.y);
 
         return v;
     }
@@ -420,25 +420,6 @@ impl<T: Copy> A2<T>
         let i = self.vec_idx(p.x, p.y);
 
         return self.data[i];
-    }
-}
-
-impl<T: Default> A2<T>
-{
-    #[allow(dead_code)]
-    pub fn new_default(dims: P) -> A2<T>
-    {
-        let mut a = A2 {
-            data: Vec::new(),
-            w: dims.x,
-            h: dims.y,
-        };
-
-        a.data.resize_default(
-            (a.w * a.h) as usize,
-        );
-
-        return a;
     }
 }
 
@@ -517,7 +498,7 @@ mod tests {
     fn test_a2()
     {
         // Test array of bools
-        let mut bools: A2<bool> = A2::new_default(P { x: 5, y: 3 });
+        let mut bools: A2<bool> = A2::new_copied(P { x: 5, y: 3 }, false);
 
         assert_eq!(bools.size(), 5 * 3);
 

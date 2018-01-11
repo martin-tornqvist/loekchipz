@@ -53,7 +53,7 @@
 //             y: height,
 //         };
 
-//         let mut map: A2<Vec<Entity>> = A2::new_default(dims);
+//         let mut map: A2<Vec<Entity>> = A2::new_copied(dims);
 
 //         for y in 0..height
 //         {
