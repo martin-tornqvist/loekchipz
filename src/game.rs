@@ -1,34 +1,16 @@
 use entity::*;
 use geometry::P;
 use io::{Io, Key};
+use map::*;
 use states::*;
-
-// -----------------------------------------------------------------------------
-// Components used by the game state
-// -----------------------------------------------------------------------------
-struct Comps
-{
-    pos: CompRepo<P>,
-    movement: CompRepo<Option<P>>,
-}
-
-impl Comps
-{
-    pub fn new() -> Comps
-    {
-        Comps {
-            pos: CompRepo::new(),
-            movement: CompRepo::new(),
-        }
-    }
-}
+use world::*;
 
 // -----------------------------------------------------------------------------
 // Game state
 // -----------------------------------------------------------------------------
 pub struct GameState
 {
-    comps: Comps,
+    world: World,
     ent_id_generator: IdGenerator,
 }
 
@@ -37,7 +19,7 @@ impl GameState
     pub fn new() -> GameState
     {
         GameState {
-            comps: Comps::new(),
+            world: World::new(),
             ent_id_generator: IdGenerator::new(),
         }
     }
@@ -58,9 +40,15 @@ impl State for GameState
     {
         let id = self.ent_id_generator.create();
 
-        self.comps.pos.add(id, P::new(0, 0));
+        self.world.pos.add(
+            id,
+            MapP::new_from_map_xy(
+                0,
+                0,
+            ),
+        );
 
-        self.comps.movement.add(id, None);
+        self.world.movement.add(id, None);
 
         return Vec::new();
     }
@@ -71,8 +59,8 @@ impl State for GameState
 
     fn draw(&mut self, io: &mut Io)
     {
-        for c in self.comps.pos.entries.iter() {
-            io.draw_tile(P::new(64, 0), c.data);
+        for c in self.world.pos.entries.iter() {
+            io.draw_tile(P::new(64, 0), c.data.to_px_p());
         }
     }
 
@@ -85,16 +73,13 @@ impl State for GameState
         }
 
         if input.mouse_left_pressed {
-
-            let p = P::new(
-                (input.mouse_pos.x / 32) * 32,
-                (input.mouse_pos.y / 32) * 32,
-            );
-
-            *self.comps.movement.get_for(0) = Some(p);
+            *self.world.movement.get_for(0) = Some(MapP::new_from_px_xy(
+                input.mouse_pos.x,
+                input.mouse_pos.y,
+            ));
         }
 
-        for c in self.comps.movement.entries.iter() {
+        for c in self.world.movement.entries.iter() {
             if c.data.is_none() {
                 continue;
             }
@@ -103,7 +88,7 @@ impl State for GameState
 
             let p = c.data.unwrap();
 
-            *self.comps.pos.get_for(id) = p;
+            *self.world.pos.get_for(id) = p;
         }
 
         return Vec::new();

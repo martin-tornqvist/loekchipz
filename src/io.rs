@@ -12,6 +12,11 @@ use std::io::prelude::*;
 use std::path::Path;
 
 // -----------------------------------------------------------------------------
+// Some global values (should be moved to external data file)
+// -----------------------------------------------------------------------------
+pub const TILE_PX_SIZE: i32 = 32;
+
+// -----------------------------------------------------------------------------
 // Public data returned when reading input
 // -----------------------------------------------------------------------------
 pub struct InputData
@@ -134,7 +139,9 @@ impl Io
 
         spr.set_texture(&self.texture, true);
 
-        spr.set_texture_rect(&IntRect::new(src.x, src.y, 32, 32));
+        spr.set_texture_rect(
+            &IntRect::new(src.x, src.y, TILE_PX_SIZE, TILE_PX_SIZE),
+        );
 
         spr.set_position2f(dst.x as f32, dst.y as f32);
 

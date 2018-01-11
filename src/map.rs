@@ -1,9 +1,53 @@
-// use entity::Entity;
-// use geometry::*;
-// use io::Io;
-// use std::fs::File;
-// use std::io::{BufRead, BufReader};
+use geometry::*;
+use io::TILE_PX_SIZE;
 
+// -----------------------------------------------------------------------------
+// Map coordinate
+// -----------------------------------------------------------------------------
+#[derive(Copy)]
+pub struct MapP
+{
+    pub p: P,
+}
+
+impl MapP
+{
+    pub fn new_from_map_xy(x: i32, y: i32) -> MapP
+    {
+        MapP { p: P::new(x, y) }
+    }
+
+    pub fn new_from_px_xy(x: i32, y: i32) -> MapP
+    {
+        let mut map_p = MapP { p: P::new(0, 0) };
+
+        map_p.set_from_px_xy(x, y);
+
+        return map_p;
+    }
+
+    pub fn to_px_p(self) -> P
+    {
+        P::new(self.p.x * TILE_PX_SIZE, self.p.y * TILE_PX_SIZE)
+    }
+
+    pub fn set_from_px_xy(&mut self, x: i32, y: i32)
+    {
+        self.p = P::new(x / TILE_PX_SIZE, y / TILE_PX_SIZE);
+    }
+}
+
+impl Clone for MapP
+{
+    fn clone(&self) -> MapP
+    {
+        MapP { p: self.p }
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Map
+// -----------------------------------------------------------------------------
 // #[allow(dead_code)]
 // const TILE_SIZE: i32 = 16;
 

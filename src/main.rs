@@ -7,6 +7,7 @@ mod pathfind;
 mod main_menu;
 mod entity;
 mod game;
+mod world;
 mod map;
 mod io;
 mod gui;
