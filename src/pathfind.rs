@@ -2,18 +2,29 @@ use floodfill::*;
 use geometry::*;
 
 #[allow(dead_code)]
-pub fn pathfind(p0: P, p1: P, flood: &A2<i32>) -> Vec<P>
+pub fn pathfind(p0: P, p1: P, blocked: &A2<bool>) -> Vec<P>
+{
+    let flood = floodfill(
+        p0,
+        None, // TODO: Using floodfill target position is broken
+        &blocked,
+        None,
+    );
+
+    return pathfind_with_flood(p0, p1, &flood);
+}
+
+#[allow(dead_code)]
+pub fn pathfind_with_flood(p0: P, p1: P, flood: &A2<i32>) -> Vec<P>
 {
     let mut path: Vec<P> = Vec::new();
 
-    if p0 == p1
-    {
+    if p0 == p1 {
         // Origin and target is the same positionx
         return path;
     }
 
-    if flood.copy_from_p(p1) == FLOOD_VALUE_UNREACHED
-    {
+    if flood.copy_from_p(p1) == FLOOD_VALUE_UNREACHED {
         // No path exists
         return path;
     }
@@ -30,31 +41,26 @@ pub fn pathfind(p0: P, p1: P, flood: &A2<i32>) -> Vec<P>
     path[(current_dist_from_p0 - 1) as usize] = p;
 
     // Find the way back to the origin
-    'path_loop: for _ in 0..(path.len() - 1)
-    {
+    'path_loop: for _ in 0..(path.len() - 1) {
         // Origin not yet reached, find the next step
-        for d in OFFSETS_CARDINAL_FIRST_NO_CENTER.iter()
-        {
+        for d in OFFSETS_CARDINAL_FIRST_NO_CENTER.iter() {
             let adj_p = p + *d;
 
-            if !flood.is_p_inside(adj_p)
-            {
+            if !flood.is_p_inside(adj_p) {
                 // This position is outside the map
                 continue;
             }
 
             let adj_v = flood.copy_from_p(adj_p);
 
-            if adj_v == FLOOD_VALUE_UNREACHED
-            {
+            if adj_v == FLOOD_VALUE_UNREACHED {
                 // This position is blocked
                 continue;
             }
 
             let cur_v = flood.copy_from_p(p);
 
-            if adj_v >= cur_v
-            {
+            if adj_v >= cur_v {
                 // This position is not closer to the origin
                 continue;
             }
@@ -96,8 +102,6 @@ mod tests {
         *blocked.at(51, 76) = true;
         *blocked.at(51, 77) = true;
 
-        let flood = floodfill(p0, None, &blocked, None);
-
         // Expected flood values, where:
         //
         // @ = origin (p0)
@@ -118,7 +122,7 @@ mod tests {
         // Test a simple path
         let p1 = P { x: 52, y: 75 };
 
-        let path = pathfind(p0, p1, &flood);
+        let path = pathfind(p0, p1, &blocked);
 
         assert_eq!(path.len(), 4);
 
@@ -130,7 +134,7 @@ mod tests {
         // Test that no path exists to a blocked cell
         let p1_blocked = P { x: 51, y: 77 };
 
-        let path_blocked = pathfind(p0, p1_blocked, &flood);
+        let path_blocked = pathfind(p0, p1_blocked, &blocked);
 
         assert_eq!(path_blocked.len(), 0);
     }

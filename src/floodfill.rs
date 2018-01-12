@@ -5,7 +5,7 @@ pub const FLOOD_VALUE_UNREACHED: i32 = -1;
 #[allow(dead_code)]
 pub fn floodfill(
     p0: P,
-    p1: Option<P>,
+    p1: Option<P>, // TODO: Using target position is broken
     blocked: &A2<bool>,
     travel_lmt: Option<i32>,
 ) -> A2<i32>
@@ -36,92 +36,73 @@ pub fn floodfill(
 
     let mut done = false;
 
-    while !done
-    {
+    while !done {
         // Flood around the current position, and add those positions to the
         // list of positions to travel to
-        for d in OFFSETS.iter()
-        {
+        for d in OFFSETS.iter() {
             let new_p = p + *d;
 
             // Not inside the bounds?
-            if !result.is_p_inside(new_p)
-            {
+            if !result.is_p_inside(new_p) {
                 continue;
             }
 
             // Blocked?
-            if blocked.copy_from_p(new_p)
-            {
+            if blocked.copy_from_p(new_p) {
                 continue;
             }
 
             // Already visited?
-            if *result.at_p(new_p) != FLOOD_VALUE_UNREACHED
-            {
+            if *result.at_p(new_p) != FLOOD_VALUE_UNREACHED {
                 continue;
             }
 
             // This is the origin?
-            if new_p == p0
-            {
+            if new_p == p0 {
                 continue;
             }
 
             v = result.copy_from_p(p);
 
-            if travel_lmt.is_none() || (v < travel_lmt.unwrap())
-            {
+            if travel_lmt.is_none() || (v < travel_lmt.unwrap()) {
                 *result.at_p(new_p) = v + 1;
             }
 
             // Reached the target?
-            if p1.is_some() && (new_p == p1.unwrap())
-            {
+            if p1.is_some() && (new_p == p1.unwrap()) {
                 is_at_tgt = true;
 
                 break;
             }
 
-            if p1.is_none() || is_at_tgt
-            {
+            if p1.is_none() || is_at_tgt {
                 positions.push(new_p);
             }
 
         } // Offset loop
 
-        if p1.is_some()
-        {
-            if positions.len() == next_p_idx
-            {
+        if p1.is_some() {
+            if positions.len() == next_p_idx {
                 path_exists = false;
             }
 
-            if is_at_tgt || !path_exists
-            {
+            if is_at_tgt || !path_exists {
                 done = true;
             }
-        }
-        else if positions.len() == next_p_idx
-        {
+        } else if positions.len() == next_p_idx {
             done = true;
         }
 
-        if travel_lmt.is_some() && (v == travel_lmt.unwrap())
-        {
+        if travel_lmt.is_some() && (v == travel_lmt.unwrap()) {
             done = true;
         }
 
-        if p1.is_some() || !is_at_tgt
-        {
-            if positions.len() == next_p_idx
-            {
+        if p1.is_some() || !is_at_tgt {
+            if positions.len() == next_p_idx {
                 // No more positions to evaluate
                 path_exists = false;
-            }
-            else
-            // There are more positions to evaluate
-            {
+            } else {
+                // There are more positions to evaluate
                 p = positions[next_p_idx];
 
                 next_p_idx += 1;

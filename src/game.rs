@@ -1,7 +1,8 @@
 use entity::*;
-use geometry::P;
+use geometry::*;
 use io::{Io, Key};
 use map::*;
+use pathfind::pathfind;
 use states::*;
 use world::*;
 
@@ -66,6 +67,29 @@ impl State for GameState
 
     fn update(&mut self, io: &mut Io) -> Vec<StateSignal>
     {
+        let blocked_dummy = A2::new_copied(P::new(100, 100), false);
+
+        for c in self.world.movement.entries.iter() {
+            if c.data.is_none() {
+                continue;
+            }
+
+            let id = c.ent_id;
+
+            let current_map_p = &mut self.world.pos.get_for(id);
+
+            let target_map_p = c.data.unwrap();
+
+            let path =
+                pathfind(current_map_p.pos, target_map_p.pos, &blocked_dummy);
+
+            if !path.is_empty() {
+                let next_p = path[0];
+
+                current_map_p.pos = next_p;
+            }
+        }
+
         let input = io.read();
 
         if input.key == Key::Esc {
@@ -77,18 +101,6 @@ impl State for GameState
                 input.mouse_pos.x,
                 input.mouse_pos.y,
             ));
-        }
-
-        for c in self.world.movement.entries.iter() {
-            if c.data.is_none() {
-                continue;
-            }
-
-            let id = c.ent_id;
-
-            let p = c.data.unwrap();
-
-            *self.world.pos.get_for(id) = p;
         }
 
         return Vec::new();

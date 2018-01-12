@@ -7,19 +7,19 @@ use io::TILE_PX_SIZE;
 #[derive(Copy)]
 pub struct MapP
 {
-    pub p: P,
+    pub pos: P,
 }
 
 impl MapP
 {
     pub fn new_from_map_xy(x: i32, y: i32) -> MapP
     {
-        MapP { p: P::new(x, y) }
+        MapP { pos: P::new(x, y) }
     }
 
     pub fn new_from_px_xy(x: i32, y: i32) -> MapP
     {
-        let mut map_p = MapP { p: P::new(0, 0) };
+        let mut map_p = MapP { pos: P::new(0, 0) };
 
         map_p.set_from_px_xy(x, y);
 
@@ -28,12 +28,12 @@ impl MapP
 
     pub fn to_px_p(self) -> P
     {
-        P::new(self.p.x * TILE_PX_SIZE, self.p.y * TILE_PX_SIZE)
+        P::new(self.pos.x * TILE_PX_SIZE, self.pos.y * TILE_PX_SIZE)
     }
 
     pub fn set_from_px_xy(&mut self, x: i32, y: i32)
     {
-        self.p = P::new(x / TILE_PX_SIZE, y / TILE_PX_SIZE);
+        self.pos = P::new(x / TILE_PX_SIZE, y / TILE_PX_SIZE);
     }
 }
 
@@ -41,7 +41,7 @@ impl Clone for MapP
 {
     fn clone(&self) -> MapP
     {
-        MapP { p: self.p }
+        MapP { pos: self.pos }
     }
 }
 
