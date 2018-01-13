@@ -63,16 +63,16 @@ impl GuiElement for Button
 
         let is_inside = self.coords.is_p_inside(input.mouse_pos);
 
-        if input.mouse_left_pressed && is_inside {
-            log!("Mouse button pressed");
-            log!("Mouse position: {:?}", input.mouse_pos);
-            log!("My coordinates: {:?}", self.coords);
-            log!("w,h: {},{}", self.coords.w(), self.coords.h());
-            self.is_pressed = true;
-            self.is_triggered = true;
-        } else {
-            self.is_pressed = false;
-            self.is_triggered = false;
+        if input.mouse_left_pressed {
+            if is_inside {
+                self.is_pressed = true;
+            }
+        } else if input.mouse_left_released {
+            if is_inside {
+                self.is_triggered = true;
+            } else {
+                self.is_pressed = false;
+            }
         }
     }
 

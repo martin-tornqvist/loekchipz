@@ -283,8 +283,8 @@ impl Io
                     d.mouse_pos = P { x: x, y: y };
 
                     match button {
-                        mouse::Button::Left => d.mouse_left_pressed = true,
-                        mouse::Button::Right => d.mouse_right_pressed = true,
+                        mouse::Button::Left => d.mouse_left_released = true,
+                        mouse::Button::Right => d.mouse_right_released = true,
                         _ => {}
                     }
                 }
