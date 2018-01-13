@@ -1,6 +1,6 @@
 use entity::*;
 use geometry::*;
-use io::{Io, Key};
+use io::*;
 use map::*;
 use pathfind::pathfind;
 use states::*;
@@ -51,6 +51,8 @@ impl State for GameState
 
         self.world.movement.add(id, None);
 
+        self.world.time_units.add(id, 20);
+
         return Vec::new();
     }
 
@@ -61,7 +63,24 @@ impl State for GameState
     fn draw(&mut self, io: &mut Io)
     {
         for c in self.world.pos.entries.iter() {
-            io.draw_tile(P::new(64, 0), c.data.to_px_p());
+            let id = c.ent_id;
+
+            let px_p = c.data.to_px_p();
+
+            io.draw_tile(P::new(64, 0), px_p);
+
+            if self.world.time_units.contains_for(id) {
+                let time_units = *self.world.time_units.get_for(id);
+
+                io.draw_text(
+                    &time_units.to_string(),
+                    px_p.x + (TILE_PX_SIZE / 2),
+                    px_p.y + TILE_PX_SIZE,
+                    TextSize::Small,
+                    TextAnchorX::Mid,
+                    TextAnchorY::Top,
+                );
+            }
         }
     }
 
@@ -70,11 +89,23 @@ impl State for GameState
         let blocked_dummy = A2::new_copied(P::new(100, 100), false);
 
         for c in self.world.movement.entries.iter() {
+            // Has target position?
             if c.data.is_none() {
                 continue;
             }
 
             let id = c.ent_id;
+
+            // Enough time units to move?
+            let time_units = if self.world.time_units.contains_for(id) {
+                Some(*self.world.time_units.get_for(id))
+            } else {
+                None
+            };
+
+            if time_units.is_some() && time_units.unwrap() <= 0 {
+                continue;
+            }
 
             let current_map_p = &mut self.world.pos.get_for(id);
 
@@ -87,6 +118,11 @@ impl State for GameState
                 let next_p = path[0];
 
                 current_map_p.pos = next_p;
+
+                // Decrement time units
+                if time_units.is_some() {
+                    *self.world.time_units.get_for(id) -= 1;
+                }
             }
         }
 
