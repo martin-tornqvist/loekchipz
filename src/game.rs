@@ -69,11 +69,11 @@ impl State for GameState
 
             io.draw_tile(P::new(64, 0), px_p);
 
-            if self.world.time_units.contains_for(id) {
-                let time_units = *self.world.time_units.get_for(id);
+            let time_units = self.world.time_units.try_get_for(id);
 
+            if time_units.is_some() {
                 io.draw_text(
-                    &time_units.to_string(),
+                    &time_units.unwrap().to_string(),
                     px_p.x + (TILE_PX_SIZE / 2),
                     px_p.y + TILE_PX_SIZE,
                     TextSize::Small,
@@ -88,28 +88,24 @@ impl State for GameState
     {
         let blocked_dummy = A2::new_copied(P::new(100, 100), false);
 
-        for c in self.world.movement.entries.iter() {
+        for movement in self.world.movement.entries.iter() {
             // Has target position?
-            if c.data.is_none() {
+            if movement.data.is_none() {
                 continue;
             }
 
-            let id = c.ent_id;
+            let id = movement.ent_id;
 
             // Enough time units to move?
-            let time_units = if self.world.time_units.contains_for(id) {
-                Some(*self.world.time_units.get_for(id))
-            } else {
-                None
-            };
+            let time_units = self.world.time_units.try_get_for(id);
 
-            if time_units.is_some() && time_units.unwrap() <= 0 {
+            if time_units.is_some() && **time_units.as_ref().unwrap() <= 0 {
                 continue;
             }
 
             let current_map_p = &mut self.world.pos.get_for(id);
 
-            let target_map_p = c.data.unwrap();
+            let target_map_p = movement.data.unwrap();
 
             let path =
                 pathfind(current_map_p.pos, target_map_p.pos, &blocked_dummy);
@@ -121,7 +117,7 @@ impl State for GameState
 
                 // Decrement time units
                 if time_units.is_some() {
-                    *self.world.time_units.get_for(id) -= 1;
+                    *time_units.unwrap() -= 1;
                 }
             }
         }

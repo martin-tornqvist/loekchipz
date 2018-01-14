@@ -73,6 +73,33 @@ impl<T> CompRepo<T>
         return &mut self.entries[result_idx].data;
     }
 
+    pub fn try_get_for(&mut self, ent_id: Id) -> Option<&mut T>
+    {
+        let mut result_idx: usize = 0;
+        let mut found = false;
+
+        for idx in 0..self.entries.len() {
+            let e = &self.entries[idx];
+
+            if e.ent_id != ent_id {
+                continue;
+            }
+
+            if found {
+                panic!("Component found multiple times for entity {}", ent_id);
+            }
+
+            result_idx = idx;
+            found = true;
+        }
+
+        if found {
+            return Some(&mut self.entries[result_idx].data);
+        }
+
+        return None;
+    }
+
     // TODO: implement...
     // pub fn copy_all_for(&mut self, ent_id: Id) -> Vec<&mut T>
 
