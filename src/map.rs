@@ -1,5 +1,5 @@
 use geometry::*;
-use io::TILE_PX_SIZE;
+use io::TILE_SIZE;
 
 // -----------------------------------------------------------------------------
 // Map coordinate
@@ -28,12 +28,12 @@ impl MapP
 
     pub fn to_px_p(self) -> P
     {
-        P::new(self.pos.x * TILE_PX_SIZE, self.pos.y * TILE_PX_SIZE)
+        P::new(self.pos.x * TILE_SIZE, self.pos.y * TILE_SIZE)
     }
 
     pub fn set_from_px_xy(&mut self, x: i32, y: i32)
     {
-        self.pos = P::new(x / TILE_PX_SIZE, y / TILE_PX_SIZE);
+        self.pos = P::new(x / TILE_SIZE, y / TILE_SIZE);
     }
 }
 

@@ -1,10 +1,10 @@
 extern crate sfml;
 
-use self::sfml::graphics::{Color, RenderTarget, RenderWindow, Sprite, Texture,
-                           Transformable, IntRect, Font, Text, Shape,
-                           RectangleShape};
+use self::sfml::graphics::*;
+use self::sfml::system::*;
 use self::sfml::window::{ContextSettings, VideoMode, style, Event,
                          Key as SfmlKey, mouse};
+
 use geometry::*;
 use std::error::Error;
 use std::fs::File;
@@ -14,7 +14,7 @@ use std::path::Path;
 // -----------------------------------------------------------------------------
 // Some global values (should be moved to external data file)
 // -----------------------------------------------------------------------------
-pub const TILE_PX_SIZE: i32 = 32;
+pub const TILE_SIZE: i32 = 32;
 
 // -----------------------------------------------------------------------------
 // Public data returned when reading input
@@ -139,13 +139,26 @@ impl Io
 
         spr.set_texture(&self.texture, true);
 
-        spr.set_texture_rect(
-            &IntRect::new(src.x, src.y, TILE_PX_SIZE, TILE_PX_SIZE),
-        );
+        spr.set_texture_rect(&IntRect::new(src.x, src.y, TILE_SIZE, TILE_SIZE));
 
         spr.set_position2f(dst.x as f32, dst.y as f32);
 
         self.window.draw(&spr);
+    }
+
+    pub fn draw_char(
+        &mut self,
+        c: char,
+        x: i32,
+        y: i32,
+        size: TextSize,
+        anchor_x: TextAnchorX,
+        anchor_y: TextAnchorY,
+    )
+    {
+        let text = c.to_string();
+
+        self.draw_text(&text, x, y, size, anchor_x, anchor_y);
     }
 
     pub fn draw_text(
@@ -211,6 +224,28 @@ impl Io
     )
     {
         self.draw_text(str, p.x, p.y, text_size, anchor_x, anchor_y);
+    }
+
+    pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32)
+    {
+        let sfml_color = Color::rgba(255, 255, 255, 16);
+
+        let vertices = [
+            Vertex::with_pos_color(
+                Vector2f::new(x0 as f32, y0 as f32),
+                sfml_color,
+            ),
+            Vertex::with_pos_color(
+                Vector2f::new(x1 as f32, y1 as f32),
+                sfml_color,
+            ),
+        ];
+
+        self.window.draw_primitives(
+            &vertices,
+            PrimitiveType::Lines,
+            RenderStates::default(),
+        );
     }
 
     pub fn draw_rect(&mut self, r: R)

@@ -41,6 +41,8 @@ impl State for GameState
     {
         let id = self.ent_id_generator.create();
 
+        self.world.gfx.add(id, '@');
+
         self.world.pos.add(
             id,
             MapP::new_from_map_xy(
@@ -62,25 +64,65 @@ impl State for GameState
 
     fn draw(&mut self, io: &mut Io)
     {
-        for c in self.world.pos.entries.iter() {
+        // Draw entities
+        for c in self.world.gfx.entries.iter() {
             let id = c.ent_id;
 
-            let px_p = c.data.to_px_p();
+            let gfx = c.data;
 
-            io.draw_tile(P::new(64, 0), px_p);
+            let map_p = self.world.pos.try_get_for(id);
+
+            if map_p.is_none() {
+                continue;
+            }
+
+            let px_p = map_p.unwrap().to_px_p();
+
+            io.draw_char(
+                gfx,
+                px_p.x + (TILE_SIZE / 2),
+                px_p.y + (TILE_SIZE / 2),
+                TextSize::Big,
+                TextAnchorX::Mid,
+                TextAnchorY::Mid,
+            );
 
             let time_units = self.world.time_units.try_get_for(id);
 
             if time_units.is_some() {
                 io.draw_text(
                     &time_units.unwrap().to_string(),
-                    px_p.x + (TILE_PX_SIZE / 2),
-                    px_p.y + TILE_PX_SIZE,
+                    px_p.x + TILE_SIZE,
+                    px_p.y,
                     TextSize::Small,
-                    TextAnchorX::Mid,
+                    TextAnchorX::Right,
                     TextAnchorY::Top,
                 );
             }
+        }
+
+        // Draw a grid overlay
+        let nr_cells_x = 16;
+        let nr_cells_y = 16;
+
+        // Vertical lines
+        for x in 0..nr_cells_x {
+            io.draw_line(
+                x * TILE_SIZE,
+                0,
+                x * TILE_SIZE,
+                nr_cells_y * TILE_SIZE,
+            );
+        }
+
+        // Horizontal lines
+        for y in 0..nr_cells_y {
+            io.draw_line(
+                0,
+                y * TILE_SIZE,
+                nr_cells_x * TILE_SIZE,
+                y * TILE_SIZE,
+            );
         }
     }
 
