@@ -1,48 +1,12 @@
 use geometry::*;
 use io::TILE_SIZE;
 
-// -----------------------------------------------------------------------------
-// Map coordinate
-// -----------------------------------------------------------------------------
-#[derive(Copy)]
-pub struct MapP
-{
-    pub pos: P,
+pub fn to_map_pos(px_p: P) -> P {
+    P::new(px_p.x / TILE_SIZE, px_p.y / TILE_SIZE)
 }
 
-impl MapP
-{
-    pub fn new_from_map_xy(x: i32, y: i32) -> MapP
-    {
-        MapP { pos: P::new(x, y) }
-    }
-
-    pub fn new_from_px_xy(x: i32, y: i32) -> MapP
-    {
-        let mut map_p = MapP { pos: P::new(0, 0) };
-
-        map_p.set_from_px_xy(x, y);
-
-        return map_p;
-    }
-
-    pub fn to_px_p(self) -> P
-    {
-        P::new(self.pos.x * TILE_SIZE, self.pos.y * TILE_SIZE)
-    }
-
-    pub fn set_from_px_xy(&mut self, x: i32, y: i32)
-    {
-        self.pos = P::new(x / TILE_SIZE, y / TILE_SIZE);
-    }
-}
-
-impl Clone for MapP
-{
-    fn clone(&self) -> MapP
-    {
-        MapP { pos: self.pos }
-    }
+pub fn to_px_pos(px_p: P) -> P {
+    P::new(px_p.x * TILE_SIZE, px_p.y * TILE_SIZE)
 }
 
 // -----------------------------------------------------------------------------

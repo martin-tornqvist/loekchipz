@@ -1,18 +1,26 @@
 use entity::*;
-use map::*;
+use geometry::*;
 
-pub struct World
-{
+// -----------------------------------------------------------------------------
+// Movement component
+// -----------------------------------------------------------------------------
+pub struct Movement {
+    pub path: Vec<P>,
+    pub is_moving: bool,
+}
+
+// -----------------------------------------------------------------------------
+// Game world components
+// -----------------------------------------------------------------------------
+pub struct World {
     pub gfx: CompRepo<char>,
-    pub pos: CompRepo<MapP>,
-    pub movement: CompRepo<Option<MapP>>,
+    pub pos: CompRepo<P>,
+    pub movement: CompRepo<Movement>,
     pub time_units: CompRepo<i32>,
 }
 
-impl World
-{
-    pub fn new() -> World
-    {
+impl World {
+    pub fn new() -> World {
         World {
             gfx: CompRepo::new(),
             pos: CompRepo::new(),

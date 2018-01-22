@@ -2,9 +2,8 @@ extern crate sfml;
 
 use self::sfml::graphics::*;
 use self::sfml::system::*;
-use self::sfml::window::{ContextSettings, VideoMode, style, Event,
-                         Key as SfmlKey, mouse};
-
+use self::sfml::window::{mouse, style, ContextSettings, Event, Key as SfmlKey,
+                         VideoMode};
 use geometry::*;
 use std::error::Error;
 use std::fs::File;
@@ -19,8 +18,7 @@ pub const TILE_SIZE: i32 = 32;
 // -----------------------------------------------------------------------------
 // Public data returned when reading input
 // -----------------------------------------------------------------------------
-pub struct InputData
-{
+pub struct InputData {
     pub char: char,
     pub key: Key,
     pub mouse_pos: P,
@@ -30,10 +28,8 @@ pub struct InputData
     pub mouse_right_released: bool,
 }
 
-impl InputData
-{
-    pub fn new() -> InputData
-    {
+impl InputData {
+    pub fn new() -> InputData {
         InputData {
             char: 0 as char,
             key: Key::Undefined,
@@ -49,8 +45,7 @@ impl InputData
 // -----------------------------------------------------------------------------
 // Public struct handling drawing and user input (wraps SFML)
 // -----------------------------------------------------------------------------
-pub struct Io
-{
+pub struct Io {
     window: RenderWindow,
     texture: Texture,
     font: Font,
@@ -60,23 +55,20 @@ pub struct Io
 // Text drawing parameters
 // -----------------------------------------------------------------------------
 #[allow(dead_code)]
-pub enum TextSize
-{
+pub enum TextSize {
     Small,
     Big,
 }
 
 #[allow(dead_code)]
-pub enum TextAnchorX
-{
+pub enum TextAnchorX {
     Left,
     Mid,
     Right,
 }
 
 #[allow(dead_code)]
-pub enum TextAnchorY
-{
+pub enum TextAnchorY {
     Top,
     Mid,
     Bottom,
@@ -85,10 +77,8 @@ pub enum TextAnchorY
 // -----------------------------------------------------------------------------
 // IO struct responsible for all input/output handling
 // -----------------------------------------------------------------------------
-impl Io
-{
-    pub fn new() -> Io
-    {
+impl Io {
+    pub fn new() -> Io {
         let title = "Loekchipz 0.0.1";
 
         let w = 800;
@@ -121,20 +111,15 @@ impl Io
         }
     }
 
-    pub fn clear_screen(&mut self)
-    {
-        self.window.clear(
-            &Color::rgb(10, 10, 10),
-        );
+    pub fn clear_screen(&mut self) {
+        self.window.clear(&Color::rgb(10, 10, 10));
     }
 
-    pub fn update_screen(&mut self)
-    {
+    pub fn update_screen(&mut self) {
         self.window.display();
     }
 
-    pub fn draw_tile(&mut self, src: P, dst: P)
-    {
+    pub fn draw_tile(&mut self, src: P, dst: P) {
         let mut spr = Sprite::new();
 
         spr.set_texture(&self.texture, true);
@@ -154,8 +139,7 @@ impl Io
         size: TextSize,
         anchor_x: TextAnchorX,
         anchor_y: TextAnchorY,
-    )
-    {
+    ) {
         let text = c.to_string();
 
         self.draw_text(&text, x, y, size, anchor_x, anchor_y);
@@ -169,8 +153,7 @@ impl Io
         size: TextSize,
         anchor_x: TextAnchorX,
         anchor_y: TextAnchorY,
-    )
-    {
+    ) {
         let mut text = Text::new();
 
         text.set_font(&self.font);
@@ -221,14 +204,12 @@ impl Io
         text_size: TextSize,
         anchor_x: TextAnchorX,
         anchor_y: TextAnchorY,
-    )
-    {
+    ) {
         self.draw_text(str, p.x, p.y, text_size, anchor_x, anchor_y);
     }
 
-    pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32)
-    {
-        let sfml_color = Color::rgba(255, 255, 255, 16);
+    pub fn draw_line(&mut self, x0: i32, y0: i32, x1: i32, y1: i32) {
+        let sfml_color = Color::rgba(255, 255, 255, 32);
 
         let vertices = [
             Vertex::with_pos_color(
@@ -248,8 +229,7 @@ impl Io
         );
     }
 
-    pub fn draw_rect(&mut self, r: R)
-    {
+    pub fn draw_rect(&mut self, r: R) {
         let mut rect = RectangleShape::new();
 
         rect.set_origin2f(0.0, 0.0);
@@ -267,8 +247,7 @@ impl Io
         self.window.draw(&rect);
     }
 
-    pub fn read(&mut self) -> InputData
-    {
+    pub fn read(&mut self) -> InputData {
         let mut d = InputData::new();
 
         for event in self.window.events() {
@@ -280,8 +259,7 @@ impl Io
                         return d;
                     }
                     // Numbers
-                    else if (code >= SfmlKey::Num0) &&
-                               (code <= SfmlKey::Num9)
+                    else if (code >= SfmlKey::Num0) && (code <= SfmlKey::Num9)
                     {
                         d.char = sfml_key_to_char('0', SfmlKey::Num0, code);
                         return d;
@@ -338,18 +316,15 @@ impl Io
 // -----------------------------------------------------------------------------
 // Read file to string
 // -----------------------------------------------------------------------------
-pub fn file_to_str(path: &Path) -> String
-{
+pub fn file_to_str(path: &Path) -> String {
     let path_display = path.display();
 
     let mut file = match File::open(&path) {
-        Err(why) => {
-            panic!(
-                "Could not open file '{}': {}",
-                path_display,
-                why.description()
-            )
-        }
+        Err(why) => panic!(
+            "Could not open file '{}': {}",
+            path_display,
+            why.description()
+        ),
         Ok(file) => {
             log!("Successfully opened file '{}'", path_display);
 
@@ -360,13 +335,11 @@ pub fn file_to_str(path: &Path) -> String
     let mut s = String::new();
 
     match file.read_to_string(&mut s) {
-        Err(why) => {
-            panic!(
-                "Could not read file '{}': {}",
-                path_display,
-                why.description()
-            )
-        }
+        Err(why) => panic!(
+            "Could not read file '{}': {}",
+            path_display,
+            why.description()
+        ),
         Ok(_) => {
             log!("Successfully read file '{}'", path_display);
         }
@@ -379,8 +352,7 @@ pub fn file_to_str(path: &Path) -> String
 // Special keys
 // -----------------------------------------------------------------------------
 #[derive(PartialEq, Eq)]
-pub enum Key
-{
+pub enum Key {
     Undefined,
     Esc,
     Space,
@@ -395,8 +367,7 @@ fn sfml_key_to_char(
     base_char: char,
     base_sfml_key: SfmlKey,
     sfml_key: SfmlKey,
-) -> char
-{
+) -> char {
     let mut val = base_char as u8;
 
     val -= base_sfml_key as u8;
