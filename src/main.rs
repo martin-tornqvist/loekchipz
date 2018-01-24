@@ -5,7 +5,6 @@ mod states;
 mod floodfill;
 mod pathfind;
 mod main_menu;
-mod entity;
 mod game;
 mod world;
 mod map;
@@ -33,10 +32,8 @@ pub fn main()
 
     states.push(Box::new(MainMenuState::new()));
 
-    'state_loop: loop
-    {
-        if states.is_empty()
-        {
+    'state_loop: loop {
+        if states.is_empty() {
             log!("No states left - bye!");
 
             break 'state_loop;
@@ -44,8 +41,7 @@ pub fn main()
 
         let signals_start = states.start();
 
-        if !signals_start.is_empty()
-        {
+        if !signals_start.is_empty() {
             // Push/pop states etc
             states.process_signals(signals_start);
 
@@ -60,15 +56,13 @@ pub fn main()
 
         let signals_update = states.update(&mut io);
 
-        if !signals_update.is_empty()
-        {
+        if !signals_update.is_empty() {
             // Push/pop states etc
             states.process_signals(signals_update);
 
             continue;
         }
 
-        std::thread::sleep(Duration::from_millis(10));
-
+        std::thread::sleep(Duration::from_millis(1));
     } // State loop
 }
