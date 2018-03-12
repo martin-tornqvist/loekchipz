@@ -1,9 +1,0 @@
-[package]
-name = "loekchipz"
-version = "0.0.1"
-authors = ["Martin Törnqvist m.tornq@gmail.com",
-           "Patrik Thorell   p.str1989@gmail.com"]
-
-[dependencies]
-sfml = "0.12.0"
-json = "*"
