@@ -1,116 +1,146 @@
-#include "io.h"
+#include "io.hpp"
 #include <iostream>
 
-namespace g {
+// -----------------------------------------------------------------------------
+// Private
+// -----------------------------------------------------------------------------
+static SDL_Window* window;
+static SDL_Renderer* renderer;
+static SDL_Texture* font;
 
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
-const int FONT_W = 16;
-const int FONT_H = 16;
-}
+namespace g
+{
 
-namespace{
-	SDL_Window* _window;
-	SDL_Renderer* _renderer;
-	SDL_Texture* _font;
-}
-
-namespace io {
-
-void Init(){
-
-	SDL_Init(SDL_INIT_VIDEO);
-    
-	_window = SDL_CreateWindow("LoekChipz",
-				   SDL_WINDOWPOS_UNDEFINED,
-				   SDL_WINDOWPOS_UNDEFINED,
-				   g::SCREEN_WIDTH,
-				   g::SCREEN_HEIGHT,
-				   0);
-    
-	_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
-   
-    
-	SDL_Surface* loadedSurface = IMG_Load("gfx/16x16.png");
-    
-	if(loadedSurface == NULL)
-		std::cout << "Could not open " << "16x16.png" << std::endl;
-    
-	SDL_SetColorKey(loadedSurface,SDL_TRUE, SDL_MapRGB(loadedSurface->format, 255, 255, 255 ) );
-    
-	_font = SDL_CreateTextureFromSurface(_renderer, loadedSurface);
-    
-	SDL_FreeSurface(loadedSurface);
-	
-  
-	
-} // Init
-
-void Cleanup(){
-	SDL_DestroyTexture(_font);
-	SDL_DestroyRenderer(_renderer);
-	SDL_DestroyWindow(_window);
-	SDL_Quit();
-} // Cleanup
-
-void drawChar(char c, int x, int y, cColor cC){
-	SDL_Rect srcRct;
-	if(c >= ' ' && c <= '/'){
-		srcRct.y = 0;
-		srcRct.x = ((int)c-32)*g::FONT_W;
-		srcRct.w = g::FONT_W;
-		srcRct.h = g::FONT_H;
-	}
-	else if(c >= '0' && c <= '?'){
-		srcRct.y = 1*g::FONT_H;
-		srcRct.x = ((int)c-48)*g::FONT_W;
-		srcRct.w = g::FONT_W;
-		srcRct.h = g::FONT_H;
-
-	}
-	else if(c >= '@' && c <= 'O'){
-		srcRct.y = 2*g::FONT_H;
-		srcRct.x = ((int)c-64)*g::FONT_W;
-		srcRct.w = g::FONT_W;
-		srcRct.h = g::FONT_H;
-	}
-	else if(c >= 'P' && c <= '_'){
-		srcRct.y = 3*g::FONT_H;
-		srcRct.x = ((int)c-80)*g::FONT_W;
-		srcRct.w = g::FONT_W;
-		srcRct.h = g::FONT_H;
-	}
-	else if(c >= '\'' && c <= 'o'){
-		srcRct.y = 4*g::FONT_H;
-		srcRct.x = ((int)c-96)*g::FONT_W;
-		srcRct.w = g::FONT_W;
-		srcRct.h = g::FONT_H;
-	}
-	else if(c >= 'p' && c <= '~'){
-		srcRct.y = 5*g::FONT_H;
-		srcRct.x = ((int)c-112)*g::FONT_W;
-		srcRct.w = g::FONT_W;
-		srcRct.h = g::FONT_H;
-	}
-	SDL_Rect dstRct;
-	dstRct.x = x*g::FONT_W;
-	dstRct.y = y*g::FONT_H;
-	dstRct.w = g::FONT_W;
-	dstRct.h = g::FONT_H;
-  
-	SDL_Rect rect = {dstRct.x, dstRct.y, dstRct.w, dstRct.h};
-	SDL_SetRenderDrawColor(_renderer, cC.r, cC.g, cC.b, 255);
-	SDL_RenderFillRect(_renderer, &rect);
-	SDL_RenderCopy(_renderer, _font, &srcRct, &dstRct);
-} // drawChar
-	
-void Clear(){
-	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
-	SDL_RenderClear(_renderer);
-} // Clear
-
-void Flip(){
-	SDL_RenderPresent(_renderer);
-} // Flip
+const int screen_width = 1280;
+const int screen_height = 720;
+const int font_w = 16;
+const int font_h = 16;
 
 }
+
+// -----------------------------------------------------------------------------
+// io
+// -----------------------------------------------------------------------------
+namespace io
+{
+
+void init()
+{
+
+        SDL_Init(SDL_INIT_VIDEO);
+
+        window = SDL_CreateWindow(
+                "LoekChipz",
+                SDL_WINDOWPOS_CENTERED,
+                SDL_WINDOWPOS_CENTERED,
+                g::screen_width,
+                g::screen_height,
+                0);
+
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+        SDL_Surface* loaded_surface = IMG_Load("gfx/16x16.png");
+
+        if (!loaded_surface)
+        {
+                std::cout << "Could not open "
+                          << "16x16.png"
+                          << std::endl
+                          << SDL_GetError()
+                          << std::endl;
+        }
+
+        SDL_SetColorKey(
+                loaded_surface,
+                SDL_TRUE,
+                SDL_MapRGB(loaded_surface->format, 255, 255, 255));
+
+        font = SDL_CreateTextureFromSurface(renderer, loaded_surface);
+
+        SDL_FreeSurface(loaded_surface);
+}
+
+void cleanup()
+{
+        SDL_DestroyTexture(font);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+}
+
+void draw_char(char c, int x, int y, Color color)
+{
+        SDL_Rect src_rct;
+
+        if (c >= ' ' && c <= '/')
+        {
+                src_rct.y = 0;
+                src_rct.x = ((int)c - 32) * g::font_w;
+                src_rct.w = g::font_w;
+                src_rct.h = g::font_h;
+        }
+        else if (c >= '0' && c <= '?')
+        {
+                src_rct.y = 1*g::font_h;
+                src_rct.x = ((int)c - 48) * g::font_w;
+                src_rct.w = g::font_w;
+                src_rct.h = g::font_h;
+
+        }
+        else if (c >= '@' && c <= 'o')
+        {
+                src_rct.y = 2  *g::font_h;
+                src_rct.x = ((int)c - 64) * g::font_w;
+                src_rct.w = g::font_w;
+                src_rct.h = g::font_h;
+        }
+        else if (c >= 'p' && c <= '_')
+        {
+                src_rct.y = 3 * g::font_h;
+                src_rct.x = ((int)c - 80) * g::font_w;
+                src_rct.w = g::font_w;
+                src_rct.h = g::font_h;
+        }
+        else if (c >= '\'' && c <= 'o')
+        {
+                src_rct.y = 4 * g::font_h;
+                src_rct.x = ((int)c - 96) * g::font_w;
+                src_rct.w = g::font_w;
+                src_rct.h = g::font_h;
+        }
+        else if (c >= 'p' && c <= '~')
+        {
+                src_rct.y = 5 * g::font_h;
+                src_rct.x = ((int)c - 112) * g::font_w;
+                src_rct.w = g::font_w;
+                src_rct.h = g::font_h;
+        }
+
+        SDL_Rect dst_rct;
+
+        dst_rct.x = x*g::font_w;
+        dst_rct.y = y*g::font_h;
+        dst_rct.w = g::font_w;
+        dst_rct.h = g::font_h;
+
+        SDL_Rect rect = {dst_rct.x, dst_rct.y, dst_rct.w, dst_rct.h};
+
+        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+
+        SDL_RenderFillRect(renderer, &rect);
+
+        SDL_RenderCopy(renderer, font, &src_rct, &dst_rct);
+}  // draw_char
+
+void clear()
+{
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+}
+
+void flip()
+{
+        SDL_RenderPresent(renderer);
+}
+
+} // io

@@ -9,28 +9,34 @@ project(lc)
 # ------------------------------------------------------------------------------
 # Source files
 # ------------------------------------------------------------------------------
-set(SRC
-  src/io.cpp
-  src/io.h
-  src/main.cpp
+set(COMMON_SRC
+  include/io.hpp
   )
 
+set(GAME_SRC
+  ${COMMON_SRC}
 
-# ------------------------------------------------------------------------------
-# Icon (on Windows)
-# ------------------------------------------------------------------------------
-set(RC_FILE "")
+  src/main.cpp
+  src/io.cpp
+  )
 
-if(WIN32)
- set(RC_FILE ${CMAKE_SOURCE_DIR}/icon/icon.rc)
-endif()
+set(TEST_SRC
+  ${COMMON_SRC}
 
+  test/src/main.cpp
+  test/src/example.cpp
+
+  test/include/example.hpp
+
+  test/stubs/src/io.cpp
+  )
 
 # ------------------------------------------------------------------------------
 # Target definitions
 # ------------------------------------------------------------------------------
-add_executable(lc       ${SRC} ${RC_FILE})
-add_executable(lc-debug ${SRC} ${RC_FILE})
+add_executable(lc       ${GAME_SRC})
+add_executable(lc-debug ${GAME_SRC})
+add_executable(lc-test  ${TEST_SRC})
 
 set_target_properties(lc        PROPERTIES OUTPUT_NAME lc)
 set_target_properties(lc-debug  PROPERTIES OUTPUT_NAME lc-debug)
@@ -48,9 +54,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR(CMAKE_C_COMPILER_ID MATCHES "Clang") OR(CMAKE_CXX
     -Wall
     -Wextra
     -Werror
-    # implicit-fallthrough warnings must be disabled for tinyxml2, which relies
-    # on this technique
-    -Wno-implicit-fallthrough
     )
 
   set(DEBUG_COMPILE_FLAGS
@@ -85,6 +88,11 @@ target_compile_options(lc-debug PUBLIC
     ${DEBUG_COMPILE_FLAGS}
     )
 
+target_compile_options(lc-test PUBLIC
+    ${COMMON_COMPILE_FLAGS}
+    ${DEBUG_COMPILE_FLAGS}
+    )
+
 set(COMMON_INCLUDE_DIRS
     include
     )
@@ -95,6 +103,11 @@ target_include_directories(lc PUBLIC
 
 target_include_directories(lc-debug PUBLIC
     ${COMMON_INCLUDE_DIRS}
+    )
+
+target_include_directories(lc-test PUBLIC
+    ${COMMON_INCLUDE_DIRS}
+    test/include
     )
 
 # On Windows releases, remove the console window
@@ -284,13 +297,6 @@ else()
     # target_link_libraries(lc-debug PUBLIC -pg -no-pie)
 
 endif()
-
-
-# ------------------------------------------------------------------------------
-# Testing
-# ------------------------------------------------------------------------------
-
-# TODO
 
 
 # ------------------------------------------------------------------------------
