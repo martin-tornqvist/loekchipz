@@ -11,6 +11,9 @@ project(lc)
 # ------------------------------------------------------------------------------
 set(COMMON_SRC
   include/io.hpp
+  include/state.hpp
+
+  src/state.cpp
   )
 
 set(GAME_SRC
