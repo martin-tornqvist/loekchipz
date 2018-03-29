@@ -57,6 +57,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR(CMAKE_C_COMPILER_ID MATCHES "Clang") OR(CMAKE_CXX
     -Wall
     -Wextra
     -Werror
+    -Weffc++
     )
 
   set(DEBUG_COMPILE_FLAGS
