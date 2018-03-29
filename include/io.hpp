@@ -20,7 +20,7 @@ void cleanup();
 
 void draw_char(char c, int x, int y, Color color);
 
-void clear();
+void clear_screen();
 
 void flip();
 

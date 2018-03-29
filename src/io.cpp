@@ -132,9 +132,10 @@ void draw_char(char c, int x, int y, Color color)
         SDL_RenderCopy(renderer, font, &src_rct, &dst_rct);
 }  // draw_char
 
-void clear()
+void clear_screen()
 {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
         SDL_RenderClear(renderer);
 }
 

@@ -1,17 +1,51 @@
 #include "io.hpp"
+#include "state.hpp"
 
-int main(){
-
+int main()
+{
         io::init();
 
-        for (int i = 0; i < 1000; ++i)
-        {
-                io::clear();
+        States states;
 
-                io::draw_char('@', 10, 10, Color{100, 30, 30});
+        while (true)
+        {
+                if (states.is_empty())
+                {
+                        break;
+                }
+
+                {
+                        auto signals = states.start();
+
+                        if (!signals.empty())
+                        {
+                                states.process_signals(std::move(signals));
+
+                                continue;
+                        }
+                }
+
+                io::clear_screen();
+
+                states.draw();
 
                 io::flip();
-        }
+
+                {
+                        auto signals = states.update();
+
+                        if (!signals.empty())
+                        {
+                                states.process_signals(std::move(signals));
+
+                                continue;
+                        }
+                }
+
+                // TODO:
+                // io::sleep(1);
+
+        } // state loop
 
         io::cleanup();
 

@@ -33,7 +33,15 @@ struct StateSignal
         std::unique_ptr<State> state = nullptr;
 };
 
-// Base class for specific states (e.g. Game state)
+// Container for a state + meta data
+struct StateNode
+{
+        std::unique_ptr<State> state = nullptr;
+
+        bool is_started = false;
+};
+
+// Base class for states
 class State
 {
 public:
@@ -58,19 +66,14 @@ public:
         }
 
         virtual void on_popped() {}
-
-        bool is_started()
-        {
-                return is_started_;
-        }
-
-private:
-        bool is_started_ = false;
 };
 
 class States
 {
 public:
+        States() :
+                states_() {}
+
         std::vector< std::unique_ptr<StateSignal> > start();
 
         void draw();
@@ -87,7 +90,7 @@ public:
                 std::vector< std::unique_ptr<StateSignal> > signals);
 
 private:
-        std::vector< std::unique_ptr<State> > states_;
+        std::vector<StateNode> states_;
 };
 
 #endif // STATE_HPP
