@@ -1,21 +1,106 @@
 #include "io.hpp"
 #include <iostream>
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
-static SDL_Window* window;
-static SDL_Renderer* renderer;
-static SDL_Texture* font;
+static SDL_Window* window_ = nullptr;
+static SDL_Renderer* renderer_ = nullptr;
+static TTF_Font* font_ = nullptr;
 
-namespace g
+static const int screen_w = 1280;
+static const int screen_h = 720;
+
+static void cleanup_window()
 {
+        if (window_)
+        {
+                SDL_DestroyWindow(window_);
+        }
+}
 
-const int screen_width = 1280;
-const int screen_height = 720;
-const int font_w = 16;
-const int font_h = 16;
+static void init_window()
+{
+        cleanup_window();
 
+        window_ = SDL_CreateWindow(
+                "LoekChipz",
+                SDL_WINDOWPOS_CENTERED,
+                SDL_WINDOWPOS_CENTERED,
+                screen_w,
+                screen_h,
+                SDL_WINDOW_SHOWN);
+
+        if (!window_)
+        {
+                std::cerr << "Failed to create SDL window: "
+                          << SDL_GetError()
+                          << std::endl;
+
+                // TODO: Crash
+        }
+}
+
+static void cleanup_font()
+{
+        if (font_)
+        {
+                TTF_CloseFont(font_);
+        }
+}
+
+static void init_font()
+{
+        cleanup_font();
+
+        const std::string font_path = "font/DejaVuSans.ttf";
+
+        const int font_size = 16;
+
+        font_ = TTF_OpenFont(font_path.c_str(), font_size);
+
+        if (!font_)
+        {
+                std::cerr << "Failed to load load font at "
+                          << "'" << font_path << "'"
+                          << ":"
+                          << std::endl
+                          << TTF_GetError()
+                          << std::endl;
+
+                // TODO: Crash
+        }
+}
+
+static void cleanup_renderer()
+{
+        if (renderer_)
+        {
+                SDL_DestroyRenderer(renderer_);
+        }
+}
+
+static void init_renderer()
+{
+        cleanup_renderer();
+
+        renderer_ = SDL_CreateRenderer(
+                window_,
+                -1,
+                SDL_RENDERER_ACCELERATED);
+
+        if (!renderer_)
+        {
+                std::cerr << "Failed to create SDL renderer: "
+                          << SDL_GetError()
+                          << std::endl;
+
+                // TODO: Crash
+        }
 }
 
 // -----------------------------------------------------------------------------
@@ -26,122 +111,100 @@ namespace io
 
 void init()
 {
+        SDL_Init(SDL_INIT_EVERYTHING);
 
-        SDL_Init(SDL_INIT_VIDEO);
+        TTF_Init();
 
-        window = SDL_CreateWindow(
-                "LoekChipz",
-                SDL_WINDOWPOS_CENTERED,
-                SDL_WINDOWPOS_CENTERED,
-                g::screen_width,
-                g::screen_height,
-                0);
+        init_window();
 
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+        init_renderer();
 
-        SDL_Surface* loaded_surface = IMG_Load("gfx/16x16.png");
-
-        if (!loaded_surface)
-        {
-                std::cout << "Could not open "
-                          << "16x16.png"
-                          << std::endl
-                          << SDL_GetError()
-                          << std::endl;
-        }
-
-        SDL_SetColorKey(
-                loaded_surface,
-                SDL_TRUE,
-                SDL_MapRGB(loaded_surface->format, 255, 255, 255));
-
-        font = SDL_CreateTextureFromSurface(renderer, loaded_surface);
-
-        SDL_FreeSurface(loaded_surface);
+        init_font();
 }
 
 void cleanup()
 {
-        SDL_DestroyTexture(font);
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
+        cleanup_font();
+
+        cleanup_renderer();
+
+        cleanup_window();
+
+        TTF_Quit();
+
         SDL_Quit();
 }
 
-void draw_char(char c, int x, int y, Color color)
+void draw_text(
+        const std::string& str,
+        const PxPos pos,
+        const Color color)
 {
-        SDL_Rect src_rct;
+        SDL_Surface* srf =
+                TTF_RenderText_Blended(
+                        font_,
+                        str.c_str(),
+                        {color.r, color.g, color.b, 0});
 
-        if (c >= ' ' && c <= '/')
+        if (!srf)
         {
-                src_rct.y = 0;
-                src_rct.x = ((int)c - 32) * g::font_w;
-                src_rct.w = g::font_w;
-                src_rct.h = g::font_h;
-        }
-        else if (c >= '0' && c <= '?')
-        {
-                src_rct.y = 1*g::font_h;
-                src_rct.x = ((int)c - 48) * g::font_w;
-                src_rct.w = g::font_w;
-                src_rct.h = g::font_h;
+                std::cerr << "Failed to create SDL font surface: "
+                          << TTF_GetError()
+                          << std::endl;
 
-        }
-        else if (c >= '@' && c <= 'o')
-        {
-                src_rct.y = 2  *g::font_h;
-                src_rct.x = ((int)c - 64) * g::font_w;
-                src_rct.w = g::font_w;
-                src_rct.h = g::font_h;
-        }
-        else if (c >= 'p' && c <= '_')
-        {
-                src_rct.y = 3 * g::font_h;
-                src_rct.x = ((int)c - 80) * g::font_w;
-                src_rct.w = g::font_w;
-                src_rct.h = g::font_h;
-        }
-        else if (c >= '\'' && c <= 'o')
-        {
-                src_rct.y = 4 * g::font_h;
-                src_rct.x = ((int)c - 96) * g::font_w;
-                src_rct.w = g::font_w;
-                src_rct.h = g::font_h;
-        }
-        else if (c >= 'p' && c <= '~')
-        {
-                src_rct.y = 5 * g::font_h;
-                src_rct.x = ((int)c - 112) * g::font_w;
-                src_rct.w = g::font_w;
-                src_rct.h = g::font_h;
+                // TODO: Crash
+
+                return;
         }
 
-        SDL_Rect dst_rct;
+        SDL_Rect sdl_rect;
 
-        dst_rct.x = x*g::font_w;
-        dst_rct.y = y*g::font_h;
-        dst_rct.w = g::font_w;
-        dst_rct.h = g::font_h;
+        sdl_rect.x = pos.value.x;
+        sdl_rect.y = pos.value.y;
 
-        SDL_Rect rect = {dst_rct.x, dst_rct.y, dst_rct.w, dst_rct.h};
+        sdl_rect.w = srf->w;
+        sdl_rect.h = srf->h;
 
-        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, srf);
 
-        SDL_RenderFillRect(renderer, &rect);
+        SDL_RenderCopy(
+                renderer_,
+                texture,
+                nullptr, // Cropping (unused)
+                &sdl_rect);
 
-        SDL_RenderCopy(renderer, font, &src_rct, &dst_rct);
-}  // draw_char
+        SDL_DestroyTexture(texture);
+
+        SDL_FreeSurface(srf);
+}
 
 void clear_screen()
 {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 0);
 
-        SDL_RenderClear(renderer);
+        SDL_RenderClear(renderer_);
 }
 
 void flip()
 {
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(renderer_);
+}
+
+void sleep(const uint32_t duration)
+{
+        if (duration == 1)
+        {
+                SDL_Delay(duration);
+        }
+        else // Duration longer than 1 ms
+        {
+                const Uint32 wait_until = SDL_GetTicks() + duration;
+
+                while (SDL_GetTicks() < wait_until)
+                {
+                        SDL_PumpEvents();
+                }
+        }
 }
 
 } // io

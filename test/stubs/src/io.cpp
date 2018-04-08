@@ -13,15 +13,17 @@ void cleanup()
 
 }
 
-void draw_char(char c, int x, int y, Color color)
+void draw_text(
+        const std::string& str,
+        const PxPos pos,
+        const Color color)
 {
-        (void)c;
-        (void)x;
-        (void)y;
+        (void)str;
+        (void)pos;
         (void)color;
 }
 
-void clear()
+void clear_screen()
 {
 
 }
@@ -29,6 +31,11 @@ void clear()
 void flip()
 {
 
+}
+
+void sleep(const uint32_t duration)
+{
+        (void)duration;
 }
 
 } // io

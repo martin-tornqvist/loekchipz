@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------------------
 // States
 // -----------------------------------------------------------------------------
-std::vector< std::unique_ptr<StateSignal> > States::start()
+std::vector<StateSignal> States::start()
 {
         auto& top = states_.back();
 
@@ -34,7 +34,7 @@ void States::draw()
         states_.back().state->draw();
 }
 
-std::vector< std::unique_ptr<StateSignal> > States::update()
+std::vector<StateSignal> States::update()
 {
         auto signals = states_.back().state->update();
 
@@ -86,19 +86,19 @@ bool States::is_empty()
         return states_.empty();
 }
 
-void States::process_signals(
-        std::vector< std::unique_ptr<StateSignal> > signals)
+void States::process_signals(std::vector<StateSignal> signals)
 {
         for (const auto& sig : signals)
         {
-                switch (sig->id)
+                switch (sig.id)
                 {
                 case StateSignalId::pop:
                         pop();
                         break;
 
                 case StateSignalId::push:
-                        push(std::move(sig->state));
+                        auto new_state = std::unique_ptr<State>(sig.state);
+                        push(std::move(new_state));
                         break;
                 }
         }

@@ -30,7 +30,7 @@ struct StateSignal
         StateId state_id = StateId::END;
 
         // Use depends on signal id
-        std::unique_ptr<State> state = nullptr;
+        State* state = nullptr;
 };
 
 // Container for a state + meta data
@@ -51,7 +51,7 @@ public:
 
         virtual void on_pushed() {}
 
-        virtual std::vector< std::unique_ptr<StateSignal> > on_start()
+        virtual std::vector<StateSignal> on_start()
         {
                 return {};
         }
@@ -60,7 +60,7 @@ public:
 
         virtual void draw() {}
 
-        virtual std::vector< std::unique_ptr<StateSignal> > update()
+        virtual std::vector<StateSignal> update()
         {
                 return {};
         }
@@ -74,11 +74,11 @@ public:
         States() :
                 states_() {}
 
-        std::vector< std::unique_ptr<StateSignal> > start();
+        std::vector<StateSignal> start();
 
         void draw();
 
-        std::vector< std::unique_ptr<StateSignal> > update();
+        std::vector<StateSignal> update();
 
         void push(std::unique_ptr<State> state);
 
@@ -86,8 +86,7 @@ public:
 
         bool is_empty();
 
-        void process_signals(
-                std::vector< std::unique_ptr<StateSignal> > signals);
+        void process_signals(std::vector<StateSignal> signals);
 
 private:
         std::vector<StateNode> states_;

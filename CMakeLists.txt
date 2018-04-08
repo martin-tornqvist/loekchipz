@@ -10,9 +10,13 @@ project(lc)
 # Source files
 # ------------------------------------------------------------------------------
 set(COMMON_SRC
+  include/geometry.hpp
   include/io.hpp
+  include/main_menu.hpp
   include/state.hpp
 
+  src/geometry.cpp
+  src/main_menu.cpp
   src/state.cpp
   )
 
@@ -271,13 +275,13 @@ else()
     find_package(SDL2       REQUIRED)
     find_package(SDL2_image REQUIRED)
     find_package(SDL2_mixer REQUIRED)
-    # find_package(SDL2_ttf   REQUIRED)
+    find_package(SDL2_ttf   REQUIRED)
 
     set(SDL_INCLUDE_DIRS
         ${SDL2_INCLUDE_DIR}
         ${SDL2_IMAGE_INCLUDE_DIR}
         ${SDL2_MIXER_INCLUDE_DIR}
-        # ${SDL2_TTF_INCLUDE_DIR}
+        ${SDL2_TTF_INCLUDE_DIR}
         )
 
     target_include_directories(lc       PUBLIC ${SDL_INCLUDE_DIRS})
@@ -287,7 +291,7 @@ else()
         ${SDL2_LIBRARY}
         ${SDL2_IMAGE_LIBRARIES}
         ${SDL2_MIXER_LIBRARIES}
-        # ${SDL2_TTF_LIBRARIES}
+        ${SDL2_TTF_LIBRARIES}
         )
 
     target_link_libraries(lc PUBLIC         ${SDL_LIBS})

@@ -1,11 +1,14 @@
 #include "io.hpp"
 #include "state.hpp"
+#include "main_menu.hpp"
 
 int main()
 {
         io::init();
 
         States states;
+
+        states.push(std::make_unique<MainMenu>());
 
         while (true)
         {
@@ -42,8 +45,7 @@ int main()
                         }
                 }
 
-                // TODO:
-                // io::sleep(1);
+                io::sleep(1);
 
         } // state loop
 

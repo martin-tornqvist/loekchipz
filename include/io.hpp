@@ -1,14 +1,13 @@
 #ifndef IO_H
 #define IO_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include "geometry.hpp"
 
 struct Color
 {
-        short int r;
-        short int g;
-        short int b;
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
 };
 
 namespace io
@@ -18,11 +17,16 @@ void init();
 
 void cleanup();
 
-void draw_char(char c, int x, int y, Color color);
+void draw_text(
+        const std::string& str,
+        const PxPos pos,
+        const Color color);
 
 void clear_screen();
 
 void flip();
+
+void sleep(const uint32_t duration);
 
 } // io
 
