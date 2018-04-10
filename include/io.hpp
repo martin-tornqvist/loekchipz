@@ -3,6 +3,19 @@
 
 #include "geometry.hpp"
 
+struct InputData
+{
+        char c = 0;
+
+        // TODO: key code (e.g. up, down, enter, backspace, ...)
+
+        PxPos mouse_pos = {};
+        bool mouse_left_pressed = false;
+        bool mouse_left_released = false;
+        bool mouse_right_pressed = false;
+        bool mouse_right_released = false;
+};
+
 struct Color
 {
         uint8_t r;

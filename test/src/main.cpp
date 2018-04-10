@@ -1,9 +1,9 @@
-#include "example.hpp"
+#include "gui_tests.hpp"
 
 int main(int argc, char** argv)
 {
         (void)argc;
         (void)argv;
 
-        example_tests::run();
+        gui_tests::run();
 }

@@ -11,11 +11,13 @@ project(lc)
 # ------------------------------------------------------------------------------
 set(COMMON_SRC
   include/geometry.hpp
+  include/gui.hpp
   include/io.hpp
   include/main_menu.hpp
   include/state.hpp
 
   src/geometry.cpp
+  src/gui.cpp
   src/main_menu.cpp
   src/state.cpp
   )
@@ -30,10 +32,11 @@ set(GAME_SRC
 set(TEST_SRC
   ${COMMON_SRC}
 
-  test/src/main.cpp
-  test/src/example.cpp
+  test/include/gui_tests.hpp
+  
+  test/src/gui_tests.cpp
 
-  test/include/example.hpp
+  test/src/main.cpp
 
   test/stubs/src/io.cpp
   )
