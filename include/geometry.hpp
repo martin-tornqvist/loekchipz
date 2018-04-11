@@ -339,4 +339,58 @@ public:
         P p1;
 };
 
+template <class T>
+class A2 {
+        
+public:
+        A2(P dims) : data(dims.x * dims.y), width(dims.x), height(dims.y) {
+        }
+
+        A2(P dims, T fill) : data(dims.x*dims.y, fill), width(dims.x), height(dims.y) {                           
+        }
+
+        T at(int x, int y) {
+                return data[width * y + x];
+        }
+
+        T at_p(P p) {
+                return at(p.x, p.y);
+        }
+
+        void set_at(int x, int y, T d) {
+                int i = width * y + x;
+                data[i] = d;
+        }
+
+        void set_at_p(P p, T d) {
+                set_at(p.x, p.y, d);
+        }
+
+        P dims() {
+                return P(width, height);
+        }
+
+        int size() {
+                return width*height;
+        }
+
+        bool is_p_inside(P p) {
+                auto x_ok = (p.x >= 0) && (p.x < width);
+                auto y_ok = (p.y >= 0) && (p.y < height);
+                
+                return x_ok && y_ok;
+        }
+
+        T copy_from(int x, int y) {
+                return data[width * y + x];
+        }
+        T copy_from_p(P p) {
+                return data[width * p.y + p.x];
+        }
+        
+        std::vector<T> data;
+        int width, height;
+};
+
+
 #endif // GEOMETRY_HPP

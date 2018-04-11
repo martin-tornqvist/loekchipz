@@ -10,12 +10,14 @@ project(lc)
 # Source files
 # ------------------------------------------------------------------------------
 set(COMMON_SRC
+  include/floodfill.hpp
   include/geometry.hpp
   include/gui.hpp
   include/io.hpp
   include/main_menu.hpp
   include/state.hpp
 
+  src/floodfill.cpp
   src/geometry.cpp
   src/gui.cpp
   src/main_menu.cpp
@@ -32,8 +34,10 @@ set(GAME_SRC
 set(TEST_SRC
   ${COMMON_SRC}
 
+  test/include/floodfill_tests.hpp
   test/include/gui_tests.hpp
-  
+
+  test/src/floodfill_tests.cpp
   test/src/gui_tests.cpp
 
   test/src/main.cpp
