@@ -343,10 +343,16 @@ template <class T>
 class A2 {
         
 public:
-        A2(P dims) : data(dims.x * dims.y), width(dims.x), height(dims.y) {
+        A2(P dims) :
+                data(dims.x * dims.y),
+                width(dims.x),
+                height(dims.y) {
         }
 
-        A2(P dims, T fill) : data(dims.x*dims.y, fill), width(dims.x), height(dims.y) {                           
+        A2(P dims, T fill) :
+                data(dims.x*dims.y, fill),
+                width(dims.x),
+                height(dims.y) {                           
         }
 
         T at(int x, int y) {
@@ -371,7 +377,7 @@ public:
         }
 
         int size() {
-                return width*height;
+                return width * height;
         }
 
         bool is_p_inside(P p) {
@@ -384,6 +390,7 @@ public:
         T copy_from(int x, int y) {
                 return data[width * y + x];
         }
+        
         T copy_from_p(P p) {
                 return data[width * p.y + p.x];
         }
