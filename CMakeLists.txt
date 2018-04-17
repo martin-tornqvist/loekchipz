@@ -10,6 +10,7 @@ project(lc)
 # Source files
 # ------------------------------------------------------------------------------
 set(COMMON_SRC
+  include/pathfinding.hpp
   include/floodfill.hpp
   include/geometry.hpp
   include/gui.hpp
@@ -17,6 +18,7 @@ set(COMMON_SRC
   include/main_menu.hpp
   include/state.hpp
 
+  src/pathfinding.cpp
   src/floodfill.cpp
   src/geometry.cpp
   src/gui.cpp
@@ -34,9 +36,11 @@ set(GAME_SRC
 set(TEST_SRC
   ${COMMON_SRC}
 
+  test/include/pathfinding_tests.hpp
   test/include/floodfill_tests.hpp
   test/include/gui_tests.hpp
 
+  test/src/pathfinding_tests.cpp
   test/src/floodfill_tests.cpp
   test/src/gui_tests.cpp
 

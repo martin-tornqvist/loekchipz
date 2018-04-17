@@ -9,6 +9,7 @@
 // -----------------------------------------------------------------------------
 static void test_floodfill_blocking()
 {
+        std::cout << __func__ << std::endl;
         P p0;
         p0.x = 50;
         p0.y = 75;
@@ -52,6 +53,7 @@ static void test_floodfill_blocking()
 
 static void test_floodfill_no_path()
 {
+        std::cout << __func__ << std::endl;
         P p0;
         p0.x = 0;
         p0.y = 0;
@@ -75,6 +77,7 @@ static void test_floodfill_no_path()
 
 static void test_floodfill_travel_lmt_too_low()
 {
+        std::cout << __func__ << std::endl;
         P p0;
         p0.x = 0;
         p0.y = 0;
