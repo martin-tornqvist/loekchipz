@@ -4,6 +4,9 @@
 #include <vector>
 #include "geometry.hpp"
 
-std::vector<P> pathfind(P p0, P p1, A2<int> flood);
+std::vector<P> pathfind(
+        const P& p0,
+        const P& p1,
+        const A2<int>& flood);
 
 #endif

@@ -1,7 +1,10 @@
 #include "pathfinding.hpp"
 #include "floodfill.hpp"
 
-std::vector<P> pathfind(P p0, P p1, A2<int> flood)
+std::vector<P> pathfind(
+        const P& p0,
+        const P& p1,
+        const A2<int>& flood)
 {
         std::vector<P> path;
 
@@ -16,7 +19,7 @@ std::vector<P> pathfind(P p0, P p1, A2<int> flood)
                 // No path exists
                 return path;
         }
-        
+
         // The path length will be equal to a the flood value at the target cell
         path.resize(flood.copy_from_p(p1), P(-1, -1));
 
@@ -49,7 +52,7 @@ std::vector<P> pathfind(P p0, P p1, A2<int> flood)
                                 // This position is blocked
                                 continue;
                         }
-                        
+
                         auto cur_v = flood.copy_from_p(p);
 
                         if (adj_v >= cur_v)
@@ -68,6 +71,6 @@ std::vector<P> pathfind(P p0, P p1, A2<int> flood)
                         break;
                 } // Offset loop
         } // Path loop
-        
+
         return path;
 }
