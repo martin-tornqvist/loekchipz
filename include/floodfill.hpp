@@ -5,6 +5,10 @@
 
 const int flood_value_unreached = -1;
 
-A2<int> floodfill(P p0, P *p1, A2<bool> blocked, int *travel_lmt);
+A2<int> floodfill(
+        const P p0,
+        const P* const p1,
+        const A2<bool>& blocked,
+        const int* const travel_limit);
 
-#endif
+#endif // FLOODFILL_HPP

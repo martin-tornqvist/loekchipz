@@ -4,12 +4,16 @@
 #include <iostream>
 
 
-A2<int> floodfill(P p0, P *p1, A2<bool> blocked, int *travel_lmt)
+A2<int> floodfill(
+        const P p0,
+        const P* const p1,
+        const A2<bool>& blocked,
+        const int* const travel_limit)
 {
         A2<int> result(blocked.dims(), flood_value_unreached);
-        
+
         result.set_at_p(p0, 0);
-        
+
         // Vector of positions to travel to
         // In the worst case we need to visit every position, reserve elements
         // for this to avoid lots of expensive resizing
@@ -29,18 +33,18 @@ A2<int> floodfill(P p0, P *p1, A2<bool> blocked, int *travel_lmt)
         bool is_at_tgt = false;
 
         bool done = false;
-        
+
         while (!done)
         {
-                // Flood around the current position, and add those positions to the
-                // list of positions to travel to
-                
+                // Flood around the current position, and add those positions to
+                // the list of positions to travel to
+
                 for (auto const & d : dir_utils::directions)
                 {
                         P new_p = p;
                         new_p.x += d.x;
                         new_p.y += d.y;
-                        
+
                         // Not inside the bounds?
                         if (!result.is_p_inside(new_p))
                         {
@@ -52,13 +56,13 @@ A2<int> floodfill(P p0, P *p1, A2<bool> blocked, int *travel_lmt)
                         {
                                 continue;
                         }
-                        
+
                         // Already visited?
                         if (result.at_p(new_p) != flood_value_unreached)
                         {
                                 continue;
                         }
-                        
+
                         // this is the origin?
                         if (new_p == p0)
                         {
@@ -67,11 +71,11 @@ A2<int> floodfill(P p0, P *p1, A2<bool> blocked, int *travel_lmt)
 
                         v = result.copy_from_p(p);
 
-                        if (travel_lmt == nullptr || v < *travel_lmt)
+                        if (travel_limit == nullptr || v < *travel_limit)
                         {
                                 result.set_at_p(new_p, v + 1);
                         }
-                        
+
                         // Reached the target?
                         if (p1 != nullptr && new_p == *p1)
                         {
@@ -81,10 +85,10 @@ A2<int> floodfill(P p0, P *p1, A2<bool> blocked, int *travel_lmt)
 
                         if (p1 == nullptr || is_at_tgt)
                         {
-                                
+
                                 positions.push_back(new_p);
                         }
-                        
+
                 } // offset loop
 
                 if (p1 != nullptr)
@@ -93,23 +97,23 @@ A2<int> floodfill(P p0, P *p1, A2<bool> blocked, int *travel_lmt)
                         {
                                 path_exists = false;
                         }
-                        
+
                         if (is_at_tgt || !path_exists)
                         {
                                 done = true;
                         }
                 }
-                
+
                 else if ((int)positions.size() == next_p_idx)
                 {
                         done = true;
                 }
 
-                if (travel_lmt != nullptr &&  (v == *travel_lmt))
+                if (travel_limit != nullptr &&  (v == *travel_limit))
                 {
                         done = true;
                 }
-                
+
                 if (p1 != nullptr || !is_at_tgt)
                 {
                         if ((int)positions.size() == next_p_idx)
@@ -117,15 +121,15 @@ A2<int> floodfill(P p0, P *p1, A2<bool> blocked, int *travel_lmt)
                                 // no more positions to evaluate
                                 path_exists = false;
                         }
-                        
+
                         else
                         {
                                 // there are more positions to evaluate
                                 p = positions[next_p_idx];
                                 next_p_idx += 1;
-                        }            
+                        }
                 }
-        }// flood_loop 
-        
+        }// flood_loop
+
         return result;
 }

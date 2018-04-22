@@ -370,12 +370,12 @@ public:
                 return at(p.x, p.y);
         }
 
-        T copy_from(int x, int y)
+        T copy_from(int x, int y) const
         {
                 return data[w * y + x];
         }
 
-        T copy_from_p(const P& p)
+        T copy_from_p(const P& p) const
         {
                 return data[w * p.y + p.x];
         }
@@ -391,17 +391,17 @@ public:
                 set_at(p.x, p.y, d);
         }
 
-        P dims()
+        P dims() const
         {
                 return P(w, h);
         }
 
-        int size()
+        int size() const
         {
                 return w * h;
         }
 
-        bool is_p_inside(const P& p)
+        bool is_p_inside(const P& p) const
         {
                 const bool x_inside = (p.x >= 0) && (p.x < w);
                 const bool y_inside = (p.y >= 0) && (p.y < h);
