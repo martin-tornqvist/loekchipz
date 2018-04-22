@@ -6,6 +6,24 @@
 
 
 // -----------------------------------------------------------------------------
+// StateSignal
+// -----------------------------------------------------------------------------
+StateSignal StateSignal::set_pop()
+{
+        id_ = StateSignalId::pop;
+
+        return *this;
+}
+
+StateSignal StateSignal::set_push(State* const new_state)
+{
+        id_ = StateSignalId::push;
+        state_ = new_state;
+
+        return *this;
+}
+
+// -----------------------------------------------------------------------------
 // States
 // -----------------------------------------------------------------------------
 std::vector<StateSignal> States::start()
@@ -90,14 +108,14 @@ void States::process_signals(std::vector<StateSignal> signals)
 {
         for (const auto& sig : signals)
         {
-                switch (sig.id)
+                switch (sig.id())
                 {
                 case StateSignalId::pop:
                         pop();
                         break;
 
                 case StateSignalId::push:
-                        auto new_state = std::unique_ptr<State>(sig.state);
+                        auto new_state = std::unique_ptr<State>(sig.state());
                         push(std::move(new_state));
                         break;
                 }

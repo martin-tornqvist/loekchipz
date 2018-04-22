@@ -15,6 +15,7 @@ enum StateSignalId
 {
         pop,
         push,
+        // TODO: Consider adding 'remove', 'pop_until', 'pop_all', ...
 };
 
 class State;
@@ -22,15 +23,41 @@ class State;
 // Returned when running states, to trigger the state handling to perform
 // actions such as popping the top state or pushing a new state. This is for
 // example how a menu state transitions into another screen.
-struct StateSignal
+// The reason for using these signals is that we don't want states to be popped
+// or pushed arbitrarily at any point in the program, but only at predefined,
+// predictable occasions. This makes the state handling more robust and simple.
+class StateSignal
 {
-        StateSignalId id = (StateSignalId)0;
+public:
+        StateSignal() {}
 
-        // Use depends on signal id
-        StateId state_id = StateId::END;
+        StateSignal set_pop();
 
-        // Use depends on signal id
-        State* state = nullptr;
+        StateSignal set_push(State* const new_state);
+
+        StateSignalId id() const
+        {
+                return id_;
+        }
+
+        // Usage of this depends on signal id
+        StateId state_id() const
+        {
+                return StateId::END;
+        }
+
+        // Usage of this depends on signal id
+        State* state() const
+        {
+                return state_;
+        }
+
+private:
+        StateSignalId id_ = (StateSignalId)0;
+
+        StateId state_id_ = StateId::END;
+
+        State* state_ = nullptr;
 };
 
 // Container for a state + meta data

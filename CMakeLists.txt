@@ -10,19 +10,23 @@ project(lc)
 # Source files
 # ------------------------------------------------------------------------------
 set(COMMON_SRC
-  include/pathfinding.hpp
+  include/component.hpp
+  include/entity.hpp
   include/floodfill.hpp
+  include/game.hpp
   include/geometry.hpp
   include/gui.hpp
   include/io.hpp
   include/main_menu.hpp
+  include/pathfinding.hpp
   include/state.hpp
 
-  src/pathfinding.cpp
   src/floodfill.cpp
+  src/game.cpp
   src/geometry.cpp
   src/gui.cpp
   src/main_menu.cpp
+  src/pathfinding.cpp
   src/state.cpp
   )
 

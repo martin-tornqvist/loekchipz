@@ -17,6 +17,7 @@ int main()
                         break;
                 }
 
+                // Start
                 {
                         auto signals = states.start();
 
@@ -28,12 +29,14 @@ int main()
                         }
                 }
 
+                // Draw
                 io::clear_screen();
 
                 states.draw();
 
                 io::flip();
 
+                // Update
                 {
                         auto signals = states.update();
 

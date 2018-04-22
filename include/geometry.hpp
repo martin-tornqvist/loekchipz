@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-class P;
+struct P;
 
 // -----------------------------------------------------------------------------
 // Direction
@@ -44,11 +44,10 @@ std::string compass_dir_name(const P& offs);
 } // dir_utils
 
 // -----------------------------------------------------------------------------
-// Position
+// P - Position
 // -----------------------------------------------------------------------------
-class P
+struct P
 {
-public:
         P() :
                 x(0),
                 y(0) {}
@@ -237,6 +236,7 @@ public:
         int x, y;
 };
 
+// Pixel position
 struct PxPos
 {
         PxPos() {}
@@ -248,11 +248,10 @@ struct PxPos
 };
 
 // -----------------------------------------------------------------------------
-// Rectangle
+// R - Rectangle
 // -----------------------------------------------------------------------------
-class R
+struct R
 {
-public:
         R() :
                 p0(P()),
                 p1(P()) {}
@@ -339,65 +338,79 @@ public:
         P p1;
 };
 
+// -----------------------------------------------------------------------------
+// A2 - Dynamic 2d array
+// -----------------------------------------------------------------------------
 template <class T>
-class A2 {
-        
+struct A2
+{
 public:
-        A2(P dims) :
+        A2() :
+                data(),
+                w(0),
+                h(0) {}
+
+        explicit A2(P dims) :
                 data(dims.x * dims.y),
-                width(dims.x),
-                height(dims.y) {
-        }
+                w(dims.x),
+                h(dims.y) {}
 
         A2(P dims, T fill) :
-                data(dims.x*dims.y, fill),
-                width(dims.x),
-                height(dims.y) {                           
+                data(dims.x * dims.y, fill),
+                w(dims.x),
+                h(dims.y) {}
+
+        T& at(int x, int y)
+        {
+                return data[w * y + x];
         }
 
-        T at(int x, int y) {
-                return data[width * y + x];
-        }
-
-        T at_p(P p) {
+        T& at_p(const P& p)
+        {
                 return at(p.x, p.y);
         }
 
-        void set_at(int x, int y, T d) {
-                int i = width * y + x;
+        T copy_from(int x, int y)
+        {
+                return data[w * y + x];
+        }
+
+        T copy_from_p(const P& p)
+        {
+                return data[w * p.y + p.x];
+        }
+
+        void set_at(int x, int y, T d)
+        {
+                int i = w * y + x;
                 data[i] = d;
         }
 
-        void set_at_p(P p, T d) {
+        void set_at_p(const P& p, T d)
+        {
                 set_at(p.x, p.y, d);
         }
 
-        P dims() {
-                return P(width, height);
+        P dims()
+        {
+                return P(w, h);
         }
 
-        int size() {
-                return width * height;
+        int size()
+        {
+                return w * h;
         }
 
-        bool is_p_inside(P p) {
-                auto x_ok = (p.x >= 0) && (p.x < width);
-                auto y_ok = (p.y >= 0) && (p.y < height);
-                
-                return x_ok && y_ok;
+        bool is_p_inside(const P& p)
+        {
+                const bool x_inside = (p.x >= 0) && (p.x < w);
+                const bool y_inside = (p.y >= 0) && (p.y < h);
+
+                return x_inside && y_inside;
         }
 
-        T copy_from(int x, int y) {
-                return data[width * y + x];
-        }
-        
-        T copy_from_p(P p) {
-                return data[width * p.y + p.x];
-        }
-        
         std::vector<T> data;
-        int width, height;
+        int w, h;
 };
-
 
 #endif // GEOMETRY_HPP

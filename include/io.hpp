@@ -1,6 +1,8 @@
 #ifndef IO_H
 #define IO_H
 
+#include <string>
+
 #include "geometry.hpp"
 
 struct InputData
