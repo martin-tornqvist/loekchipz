@@ -15,7 +15,7 @@ public:
 
         void draw() override;
 
-        std::vector<StateSignal> update() override;
+        std::vector<StateSignal> update(const InputData& input) override;
 };
 
 #endif // MAIN_MENU_HPP

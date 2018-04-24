@@ -66,10 +66,12 @@ void Game::draw()
         }
 }
 
-std::vector<StateSignal> Game::update()
+std::vector<StateSignal> Game::update(const InputData& input)
 {
-        // TODO: Placeholder, pausing for a while, then quitting
-        io::sleep(1000);
+        if (input.c == 'q')
+        {
+                return {StateSignal().set_pop()};
+        }
 
-        return {StateSignal().set_pop()};
+        return {};
 }

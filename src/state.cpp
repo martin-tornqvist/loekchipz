@@ -52,9 +52,9 @@ void States::draw()
         states_.back().state->draw();
 }
 
-std::vector<StateSignal> States::update()
+std::vector<StateSignal> States::update(const InputData& input)
 {
-        auto signals = states_.back().state->update();
+        auto signals = states_.back().state->update(input);
 
         return signals;
 }

@@ -15,6 +15,8 @@ static TTF_Font* font_ = nullptr;
 static const int screen_w = 1280;
 static const int screen_h = 720;
 
+static SDL_Event sdl_event_;
+
 static void cleanup_window()
 {
         if (window_)
@@ -188,6 +190,119 @@ void clear_screen()
 void flip()
 {
         SDL_RenderPresent(renderer_);
+}
+
+InputData read_input()
+{
+        InputData input;
+
+        SDL_GetMouseState(
+                &input.mouse_pos.value.x,
+                &input.mouse_pos.value.y);
+
+        const bool did_poll_event = SDL_PollEvent(&sdl_event_);
+
+        if (!did_poll_event)
+        {
+                return input;
+        }
+
+        switch (sdl_event_.type)
+        {
+        case SDL_WINDOWEVENT:
+        {
+                switch (sdl_event_.window.event)
+                {
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                case SDL_WINDOWEVENT_RESTORED:
+                case SDL_WINDOWEVENT_EXPOSED:
+                {
+                        // TODO
+                }
+                break;
+
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                {
+                        // TODO
+                }
+                break;
+                } // window event switch
+        }
+        break; // SDL_WINDOWEVENT
+
+        case SDL_QUIT:
+        {
+                // TODO
+        }
+        break;
+
+        case SDL_KEYUP:
+        {
+                // TODO
+        }
+        break;
+
+        case SDL_KEYDOWN:
+        {
+                // TODO
+        }
+        break;
+
+        case SDL_TEXTINPUT:
+        {
+                const char c = sdl_event_.text.text[0];
+
+                if (c >= 33 && c <= 126)
+                {
+                        input.c = c;
+                }
+        }
+        break;
+
+        case SDL_MOUSEBUTTONDOWN:
+        {
+                switch (sdl_event_.button.button)
+                {
+                case SDL_BUTTON_LEFT:
+                        input.mouse_left_pressed = true;
+                        break;
+
+                case SDL_BUTTON_RIGHT:
+                        input.mouse_right_pressed = true;
+                        break;
+
+                default:
+                        break;
+                }
+        }
+        break;
+
+        case SDL_MOUSEBUTTONUP:
+        {
+                switch (sdl_event_.button.button)
+                {
+                case SDL_BUTTON_LEFT:
+                        input.mouse_left_released = true;
+                        break;
+
+                case SDL_BUTTON_RIGHT:
+                        input.mouse_right_released = true;
+                        break;
+
+                default:
+                        break;
+                }
+        }
+        break;
+
+        default:
+        {
+        }
+        break;
+
+        } // event switch
+
+        return input;
 }
 
 void sleep(const uint32_t duration)

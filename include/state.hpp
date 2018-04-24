@@ -19,6 +19,7 @@ enum StateSignalId
 };
 
 class State;
+struct InputData;
 
 // Returned when running states, to trigger the state handling to perform
 // actions such as popping the top state or pushing a new state. This is for
@@ -87,8 +88,10 @@ public:
 
         virtual void draw() {}
 
-        virtual std::vector<StateSignal> update()
+        virtual std::vector<StateSignal> update(const InputData& input)
         {
+                (void)input;
+
                 return {};
         }
 
@@ -105,7 +108,7 @@ public:
 
         void draw();
 
-        std::vector<StateSignal> update();
+        std::vector<StateSignal> update(const InputData& input);
 
         void push(std::unique_ptr<State> state);
 

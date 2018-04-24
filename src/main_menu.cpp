@@ -7,20 +7,27 @@ void MainMenu::draw()
 {
         // TODO: Just drawing some placeholder text
         io::draw_text(
-                "Drawing some text over here",
-                {0, 0},
+                "(n) to start new game",
+                {32, 32},
+                {255, 255, 255});
+
+        io::draw_text(
+                "(q) to quit",
+                {32, 64},
                 {255, 255, 255});
 }
 
-std::vector<StateSignal> MainMenu::update()
+std::vector<StateSignal> MainMenu::update(const InputData& input)
 {
-        // TODO: Placeholder, pausing for a while, then popping the main menu
-        // and starting the game state
-        io::sleep(1000);
-
-        return
+        if (input.c == 'n')
         {
-                StateSignal().set_pop(),
-                StateSignal().set_push(new Game())
-        };
+                return {StateSignal().set_push(new Game)};
+        }
+
+        if (input.c == 'q')
+        {
+                return {StateSignal().set_pop()};
+        }
+
+        return {};
 }

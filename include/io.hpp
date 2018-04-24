@@ -41,6 +41,8 @@ void clear_screen();
 
 void flip();
 
+InputData read_input();
+
 void sleep(const uint32_t duration);
 
 } // io

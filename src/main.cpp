@@ -17,7 +17,7 @@ int main()
                         break;
                 }
 
-                // Start
+                // Start current state (if not already started)
                 {
                         auto signals = states.start();
 
@@ -38,7 +38,9 @@ int main()
 
                 // Update
                 {
-                        auto signals = states.update();
+                        const InputData input = io::read_input();
+
+                        auto signals = states.update(input);
 
                         if (!signals.empty())
                         {
