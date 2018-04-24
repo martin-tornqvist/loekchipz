@@ -322,4 +322,9 @@ void sleep(const uint32_t duration)
         }
 }
 
+uint32_t get_ticks()
+{
+        return SDL_GetTicks();
+}
+
 } // io
