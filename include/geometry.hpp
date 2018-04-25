@@ -383,7 +383,7 @@ public:
         void set_at(int x, int y, T d)
         {
                 int i = w * y + x;
-                data[i] = d;
+                data[i] = std::move(d);
         }
 
         void set_at_p(const P& p, T d)

@@ -10,6 +10,7 @@ project(lc)
 # Source files
 # ------------------------------------------------------------------------------
 set(COMMON_SRC
+  include/map.hpp
   include/component.hpp
   include/entity.hpp
   include/floodfill.hpp
@@ -21,6 +22,7 @@ set(COMMON_SRC
   include/pathfinding.hpp
   include/state.hpp
 
+  src/map.cpp
   src/floodfill.cpp
   src/game.cpp
   src/geometry.cpp

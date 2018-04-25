@@ -37,6 +37,11 @@ void draw_text(
         const PxPos pos,
         const Color color);
 
+void draw_tile(
+        const int id,
+        const PxPos pos,
+        const Color color); // TODO: should we be able to manipulate colors on the tiles?
+
 void clear_screen();
 
 void flip();

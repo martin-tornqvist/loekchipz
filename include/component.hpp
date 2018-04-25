@@ -8,6 +8,7 @@ struct GfxComponent
 {
         // TOOD: Use actual (tile) graphics
         char gfx = 0;
+        int tile_id = 0;
         Color color = {0, 0, 0};
 };
 

@@ -23,6 +23,16 @@ void draw_text(
         (void)color;
 }
 
+void draw_tile(
+        const int id,
+        const PxPos pos,
+        const Color color)
+{
+        (void)id;
+        (void)pos;
+        (void)color;
+}
+
 void clear_screen()
 {
 

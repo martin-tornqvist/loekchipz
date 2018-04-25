@@ -11,6 +11,7 @@
 static SDL_Window* window_ = nullptr;
 static SDL_Renderer* renderer_ = nullptr;
 static TTF_Font* font_ = nullptr;
+static SDL_Texture* tiles_ = nullptr;
 
 static const int screen_w = 1280;
 static const int screen_h = 720;
@@ -86,6 +87,7 @@ static void cleanup_renderer()
         }
 }
 
+
 static void init_renderer()
 {
         cleanup_renderer();
@@ -105,6 +107,29 @@ static void init_renderer()
         }
 }
 
+
+static void cleanup_tiles()
+{
+        if (tiles_)
+        {
+                SDL_DestroyTexture(tiles_);
+        }
+}
+
+static void init_tiles()
+{
+        SDL_Surface* srf = IMG_Load("gfx/tiles.png");
+    
+        if(srf == NULL)
+                std::cout << "Failed to open " << "tiles.png" << std::endl;
+    
+        SDL_SetColorKey(srf,SDL_TRUE, SDL_MapRGB(srf->format, 255, 0, 255 ) );
+        
+        tiles_ = SDL_CreateTextureFromSurface(renderer_, srf);
+
+        SDL_FreeSurface(srf);
+}
+
 // -----------------------------------------------------------------------------
 // io
 // -----------------------------------------------------------------------------
@@ -122,10 +147,14 @@ void init()
         init_renderer();
 
         init_font();
+
+        init_tiles();
 }
 
 void cleanup()
 {
+        cleanup_tiles();
+        
         cleanup_font();
 
         cleanup_renderer();
@@ -178,6 +207,28 @@ void draw_text(
         SDL_DestroyTexture(texture);
 
         SDL_FreeSurface(srf);
+}
+
+void draw_tile(
+        const int id,
+        const PxPos pos,
+        const Color color)
+{
+        SDL_Rect src = {0, 0, 32, 32}; // TODO: Use const values
+
+        // todo: fix
+        src.x = 32 * id;
+        
+        SDL_Rect dest;
+        dest.x = pos.value.x;
+        dest.y = pos.value.y;
+        dest.w = src.w;
+        dest.h = src.h;
+
+        SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 255);
+        //SDL_RenderFillRect(renderer_, &dest); // Todo: should we fill in the bg? neh?
+        SDL_RenderCopy(renderer_, tiles_, &src, &dest);
+        
 }
 
 void clear_screen()
