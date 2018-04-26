@@ -4,6 +4,7 @@
 #include <string>
 
 #include "geometry.hpp"
+#include "io.hpp"
 
 struct InputData;
 
@@ -24,9 +25,16 @@ public:
 class Button: public GuiElement
 {
 public:
-        Button(const std::string& text, const R& coords);
+        Button(const std::string& text,
+               const R& coords,
+               const Color text_color,
+               const Color frame_color);
 
-        Button(const std::string& text, const P& center_pos, const P& dims);
+        Button(const std::string& text,
+               const P& center_pos,
+               const P& dims,
+               const Color text_color,
+               const Color frame_color);
 
         void update(const InputData& input) override;
 
@@ -37,11 +45,18 @@ public:
                 return is_triggered_;
         }
 
+        std::string get_text()
+        {
+                return text_;
+        }
+
 protected:
         std::string text_;
         R coords_ = R();
         bool is_pressed_ = false;
         bool is_triggered_ = false;
+        Color text_color_;
+        Color frame_color_;
 };
 
 namespace gui

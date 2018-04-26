@@ -5,13 +5,24 @@
 // -----------------------------------------------------------------------------
 // Button
 // -----------------------------------------------------------------------------
-Button::Button(const std::string& text, const R& coords) :
+Button::Button(const std::string& text,
+               const R& coords,
+               const Color text_color,
+               const Color frame_color) :
         text_(text),
-        coords_(coords) {}
+        coords_(coords),
+        text_color_(text_color),
+        frame_color_(frame_color){}
 
-Button::Button(const std::string& text, const P& center_pos, const P& dims) :
+Button::Button(const std::string& text,
+               const P& center_pos,
+               const P& dims,
+               const Color text_color,
+               const Color frame_color) :
         text_(text),
-        coords_()
+        coords_(),
+        text_color_(text_color),
+        frame_color_(frame_color)
 {
         const P p0(center_pos.x - (dims.x - 1) / 2,
                    center_pos.y - (dims.y - 1) / 2);
@@ -49,8 +60,8 @@ void Button::update(const InputData& input)
 
 void Button::draw()
 {
-        // TODO: Draw rectangle (add functionality to the io namespace)
-
+        io::draw_rect(coords_, frame_color_);
         // TODO: Draw text centered horizontally and vertically (add
         // functionality to the io namespace)
+        io::draw_text(text_, {coords_.p0.x, coords_.p0.y}, text_color_);
 }

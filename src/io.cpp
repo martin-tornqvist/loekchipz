@@ -231,6 +231,17 @@ void draw_tile(
         
 }
 
+void draw_rect(const R& rect, const Color& color)
+{
+        SDL_Rect r;
+        r.x = rect.p0.x;
+        r.y = rect.p0.y;
+        r.w = rect.p1.x - rect.p0.x;
+        r.h = rect.p1.y - rect.p0.y;
+        SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 255);
+        SDL_RenderDrawRect(renderer_, &r);
+}
+
 void clear_screen()
 {
         SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 0);
