@@ -49,26 +49,21 @@ std::vector<StateSignal> Game::on_start()
 void Game::draw()
 {
         // Draw map
-        for (int y = 0; y < map_.dims().y; ++y)
+        for (auto& ent : map_.data)
         {
-                for (int x = 0; x < map_.dims().x; ++x)
+                if (!ent.gfx ||
+                    !ent.pos)
                 {
-                        if (!map_.at(x,y).gfx || !map_.at(x,y).pos)
-                        {
-                                continue;
-                        }
-                        
-                        int id = map_.at(x,y).gfx->tile_id;
-
-                        // TODO: Do an actual conversion between map and screen pixel
-                        // coordinates
-                        PxPos px_pos;
-                        px_pos.value = map_.at(x,y).pos->pos;
-                
-                        io::draw_tile(id, px_pos, map_.at(x,y).gfx->color);
-                        
+                        continue;
                 }
-        }
+
+                int id = ent.gfx->tile_id;
+                
+                PxPos px_pos;
+                px_pos.value = ent.pos->pos;
+
+                io::draw_tile(id, px_pos, ent.gfx->color);
+        }             
         
         // Draw actors
         for (auto& ent : actors_)
