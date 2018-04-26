@@ -33,6 +33,14 @@ void draw_tile(
         (void)color;
 }
 
+void draw_rect(
+        const R& rect,
+        const Color& color)
+{
+        (void)rect;
+        (void)color;
+}
+
 void clear_screen()
 {
 

@@ -42,7 +42,7 @@ std::vector<StateSignal> Game::on_start()
         }
 
         map_ = map::generate_map();
-        
+
         return {};
 }
 
@@ -58,13 +58,13 @@ void Game::draw()
                 }
 
                 int id = ent.gfx->tile_id;
-                
+
                 PxPos px_pos;
                 px_pos.value = ent.pos->pos;
 
                 io::draw_tile(id, px_pos, ent.gfx->color);
-        }             
-        
+        }
+
         // Draw actors
         for (auto& ent : actors_)
         {
@@ -73,7 +73,7 @@ void Game::draw()
                 {
                         continue;
                 }
-                
+
                 int id = ent.gfx->tile_id;
                 // TODO: Do an actual conversion between map and screen pixel
                 // coordinates
@@ -82,8 +82,8 @@ void Game::draw()
 
                 //io::draw_text(str, px_pos, ent.gfx->color);
                 io::draw_tile(id, px_pos, ent.gfx->color);
-                
-        }   
+
+        }
 }
 
 std::vector<StateSignal> Game::update(const InputData& input)

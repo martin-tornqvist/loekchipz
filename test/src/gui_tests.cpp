@@ -14,7 +14,9 @@ static void test_button_trigger()
 
         Button button(
                 "whatever",
-                R(500, 1000, 600, 1337));
+                R(500, 1000, 600, 1337),
+                {200,25,5},
+                {124,14,32});
 
         InputData input;
 
@@ -43,7 +45,9 @@ static void test_button_not_triggering_release_outside()
 
         Button button(
                 "whatever",
-                R(500, 1000, 600, 1337));
+                R(500, 1000, 600, 1337),
+                {100,22,211},
+                {40,255,100});
 
         InputData input;
 
@@ -70,7 +74,9 @@ static void test_button_trigger_move_outside_and_back()
 
         Button button(
                 "whatever",
-                R(500, 1000, 600, 1337));
+                R(500, 1000, 600, 1337),
+                {100,22,211},
+                {40,255,100});
 
         InputData input;
 
