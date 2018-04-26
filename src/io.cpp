@@ -95,7 +95,7 @@ static void init_renderer()
         renderer_ = SDL_CreateRenderer(
                 window_,
                 -1,
-                SDL_RENDERER_ACCELERATED);
+                SDL_RENDERER_SOFTWARE);
 
         if (!renderer_)
         {
@@ -119,12 +119,12 @@ static void cleanup_tiles()
 static void init_tiles()
 {
         SDL_Surface* srf = IMG_Load("gfx/tiles.png");
-    
+
         if(srf == NULL)
                 std::cout << "Failed to open " << "tiles.png" << std::endl;
-    
+
         SDL_SetColorKey(srf,SDL_TRUE, SDL_MapRGB(srf->format, 255, 0, 255 ) );
-        
+
         tiles_ = SDL_CreateTextureFromSurface(renderer_, srf);
 
         SDL_FreeSurface(srf);
@@ -154,7 +154,7 @@ void init()
 void cleanup()
 {
         cleanup_tiles();
-        
+
         cleanup_font();
 
         cleanup_renderer();
@@ -218,7 +218,7 @@ void draw_tile(
 
         // todo: fix
         src.x = 32 * id;
-        
+
         SDL_Rect dest;
         dest.x = pos.value.x;
         dest.y = pos.value.y;
@@ -228,7 +228,7 @@ void draw_tile(
         SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 255);
         //SDL_RenderFillRect(renderer_, &dest); // Todo: should we fill in the bg? neh?
         SDL_RenderCopy(renderer_, tiles_, &src, &dest);
-        
+
 }
 
 void draw_rect(const R& rect, const Color& color)
