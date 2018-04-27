@@ -286,6 +286,12 @@ void draw_rect(const R& rect, const Color& color)
         SDL_RenderDrawRect(renderer_, &r);
 }
 
+void draw_line(const PxPos& p0, const PxPos& p1)
+{
+        SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+        SDL_RenderDrawLine(renderer_, p0.value.x, p0.value.y, p1.value.x, p1.value.y);
+}
+
 void clear_screen()
 {
         SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 0);

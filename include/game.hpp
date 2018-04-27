@@ -28,6 +28,9 @@ public:
         std::vector<StateSignal> update(const InputData& input) override;
 
 private:
+
+        void draw_path(const PxPos& pos, std::vector<P> path);
+
         std::vector<Entity> actors_;
 
         A2<Entity> map_;
