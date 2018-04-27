@@ -63,5 +63,5 @@ void Button::draw()
         io::draw_rect(coords_, frame_color_);
         // TODO: Draw text centered horizontally and vertically (add
         // functionality to the io namespace)
-        io::draw_text(text_, {coords_.p0.x, coords_.p0.y}, text_color_);
+        io::draw_text(text_, {coords_.p0.x, coords_.p0.y}, text_color_, coords_);
 }

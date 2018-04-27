@@ -25,6 +25,8 @@ struct Color
         uint8_t b;
 };
 
+
+
 namespace io
 {
 
@@ -36,6 +38,13 @@ void draw_text(
         const std::string& str,
         const PxPos pos,
         const Color color);
+
+// Draws a text centered in a rectangle
+void draw_text(
+        const std::string& str,
+        const PxPos pos,
+        const Color color,
+        const R& rect);
 
 void draw_tile(
         const int id,

@@ -209,6 +209,50 @@ void draw_text(
         SDL_FreeSurface(srf);
 }
 
+void draw_text(
+        const std::string& str,
+        const PxPos pos,
+        const Color color,
+        const R& rect)
+{
+        SDL_Surface* srf =
+                TTF_RenderText_Blended(
+                        font_,
+                        str.c_str(),
+                        {color.r, color.g, color.b, 0});
+
+        if (!srf)
+        {
+                std::cerr << "Failed to create SDL font surface: "
+                          << TTF_GetError()
+                          << std::endl;
+
+                // TODO: Crash
+
+                return;
+        }
+
+        SDL_Rect sdl_rect;
+
+        sdl_rect.x = pos.value.x + (rect.p1.x - rect.p0.x)/2 - srf->w/2;
+        sdl_rect.y = pos.value.y + (rect.p1.y - rect.p0.y)/2 - srf->h/2;
+
+        sdl_rect.w = srf->w;
+        sdl_rect.h = srf->h;
+
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer_, srf);
+
+        SDL_RenderCopy(
+                renderer_,
+                texture,
+                nullptr, // Cropping (unused)
+                &sdl_rect);
+
+        SDL_DestroyTexture(texture);
+
+        SDL_FreeSurface(srf);
+}
+
 void draw_tile(
         const int id,
         const PxPos pos,

@@ -23,6 +23,18 @@ void draw_text(
         (void)color;
 }
 
+void draw_text(
+        const std::string& str,
+        const PxPos pos,
+        const Color color,
+        const R& rect)
+{
+        (void)str;
+        (void)pos;
+        (void)color;
+        (void)rect;
+}
+
 void draw_tile(
         const int id,
         const PxPos pos,
