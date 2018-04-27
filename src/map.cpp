@@ -1,6 +1,6 @@
 #include "map.hpp"
 #include <memory>
-
+#include "utils.hpp"
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
@@ -26,11 +26,18 @@ A2<Entity> generate_map()
                         e.gfx = std::make_unique<GfxComponent>();
                         e.gfx->tile_id = 1;
                         e.gfx->color = {255, 255, 255};
+                        if (utils::get_random_int(0,100) > 95)
+                        {
+                                e.gfx->tile_id = 4;
+                                e.block = std::make_unique<BlockComponent>();
+                                e.block->block = false;
+                        }
                         map.set_at(x,y, std::move(e));
+
                 }
         }
-        
-        
+
+
         return map;
 }
 

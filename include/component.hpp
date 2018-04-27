@@ -17,4 +17,9 @@ struct PosComponent
         P pos = {-1, -1};
 };
 
+struct BlockComponent
+{
+        bool block = false;
+};
+
 #endif // COMPONENT_HPP
