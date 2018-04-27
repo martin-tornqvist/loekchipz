@@ -53,6 +53,14 @@ void draw_rect(
         (void)color;
 }
 
+void draw_line(
+        const PxPos& p0,
+        const PxPos& p1)
+{
+        (void)p0;
+        (void)p1;
+}
+
 void clear_screen()
 {
 
