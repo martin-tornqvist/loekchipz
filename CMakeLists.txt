@@ -21,6 +21,7 @@ set(COMMON_SRC
   include/main_menu.hpp
   include/pathfinding.hpp
   include/state.hpp
+  include/utils.hpp
 
   src/map.cpp
   src/floodfill.cpp
@@ -30,6 +31,7 @@ set(COMMON_SRC
   src/main_menu.cpp
   src/pathfinding.cpp
   src/state.cpp
+  src/utils.cpp
   )
 
 set(GAME_SRC
