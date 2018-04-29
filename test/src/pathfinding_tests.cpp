@@ -22,8 +22,6 @@ static void test_pathfinding()
         blocked.set_at(51, 76, true);
         blocked.set_at(51, 77, true);
 
-        const auto flood = floodfill(p0, nullptr, blocked, nullptr);
-
         // Expected flood values, where:
         //
         // @ = origin (p0)
@@ -43,7 +41,7 @@ static void test_pathfinding()
         // Test a simple path
         const P p1 = P(52, 75);
 
-        const auto path = pathfind(p0, p1, flood);
+        const auto path = pathfind(p0, p1, blocked);
 
         assert(path.size() == 4);
         assert(path[0] == P(50, 74));
@@ -54,7 +52,7 @@ static void test_pathfinding()
         // Test that no path exists to a blocked cell
         const P p1_blocked = P(51, 77);
 
-        const auto path_blocked = pathfind(p0, p1_blocked, flood);
+        const auto path_blocked = pathfind(p0, p1_blocked, blocked);
 
         assert(path_blocked.size() == 0);
 }

@@ -1,7 +1,18 @@
 #include "pathfinding.hpp"
 #include "floodfill.hpp"
 
-std::vector<P> pathfind(
+std::vector<P> pathfind(const P& p0,
+                        const P& p1,
+                        A2<bool>& blocked)
+{
+        auto flood = floodfill(p0,
+                               nullptr,
+                               blocked,
+                               nullptr);
+        return pathfind_with_flood(p0, p1, flood);
+}
+
+std::vector<P> pathfind_with_flood(
         const P& p0,
         const P& p1,
         const A2<int>& flood)

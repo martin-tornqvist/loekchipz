@@ -1,9 +1,6 @@
 #include "floodfill.hpp"
 #include "geometry.hpp"
 
-#include <iostream>
-
-
 A2<int> floodfill(
         const P p0,
         const P* const p1,

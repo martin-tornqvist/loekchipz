@@ -10,6 +10,7 @@ struct Entity
         std::unique_ptr<GfxComponent> gfx = nullptr;
         std::unique_ptr<PosComponent> pos = nullptr;
         std::unique_ptr<BlockComponent> block = nullptr;
+        std::unique_ptr<MovementComponent> movement = nullptr;
 };
 
 #endif // ENTITY_HPP
