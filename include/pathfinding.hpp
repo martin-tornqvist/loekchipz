@@ -4,15 +4,14 @@
 #include <vector>
 #include "geometry.hpp"
 
-std::vector<P> pathfind(const P& p0,
-                        const P& p1,
-                        A2<bool>& blocked);
-
-std::vector<P> pathfind_with_flood(
+std::vector<P> pathfind(
         const P& p0,
         const P& p1,
-        const A2<int>& flood);
+        const Array2<bool>& blocked);
 
+std::vector<P> pathfind(
+        const P& p0,
+        const P& p1,
+        const Array2<int>& flood);
 
-
-#endif
+#endif // PATHFINDING_HPP

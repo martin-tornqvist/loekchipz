@@ -4,28 +4,35 @@
 #include "io.hpp"
 #include "geometry.hpp"
 
-struct GfxComponent
+// -----------------------------------------------------------------------------
+// components
+// -----------------------------------------------------------------------------
+namespace components
 {
+
+struct Gfx
+{
+        void draw(const P& pos) const;
+
         // TOOD: Use actual (tile) graphics
         char gfx = 0;
         int tile_id = 0;
         Color color = {0, 0, 0};
 };
 
-struct PosComponent
+struct Terrain
 {
-        P pos = {-1, -1};
+        bool is_blocking = false;
 };
 
-struct BlockComponent
+struct Movable
 {
-        bool block = false;
-};
+        P step();
 
-struct MovementComponent
-{
         std::vector<P> path = {};
         bool is_moving = false;
 };
+
+} // components
 
 #endif // COMPONENT_HPP

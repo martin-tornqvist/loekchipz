@@ -15,12 +15,12 @@ static void test_pathfinding()
 
         const P dims(100, 100);
 
-        A2<bool> blocked(dims);
+        Array2<bool> blocked(dims);
 
-        blocked.set_at(51, 74, true);
-        blocked.set_at(51, 75, true);
-        blocked.set_at(51, 76, true);
-        blocked.set_at(51, 77, true);
+        blocked(51, 74) = true;
+        blocked(51, 75) = true;
+        blocked(51, 76) = true;
+        blocked(51, 77) = true;
 
         // Expected flood values, where:
         //

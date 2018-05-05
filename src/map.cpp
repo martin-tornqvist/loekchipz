@@ -5,8 +5,8 @@
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
-const int map_width = 50;
-const int map_height = 50;
+static const int map_w = 50;
+static const int map_h = 50;
 
 // -----------------------------------------------------------------------------
 // map
@@ -14,30 +14,50 @@ const int map_height = 50;
 namespace map
 {
 
-A2<Entity> generate_map()
+Array2<Entity> generate()
 {
-        A2<Entity> map(P(map_width, map_height));
-        for(int y = 0; y < map_height; ++y)
+        Array2<Entity> map(P(map_w, map_h));
+
+        for(int x = 0; x < map_w; ++x)
         {
-                for(int x = 0; x < map_width; ++x)
+                for(int y = 0; y < map_h; ++y)
                 {
                         Entity e;
-                        e.pos = std::make_unique<PosComponent>();
-                        e.pos->pos = P(x*32, y*32);
-                        e.gfx = std::make_unique<GfxComponent>();
+
+                        e.pos = std::make_unique<P>();
+
+                        e.pos->set(x, y);
+
+                        e.gfx = std::make_unique<components::Gfx>();
+
                         e.gfx->tile_id = 1;
+
                         e.gfx->color = {255, 255, 255};
+
+                        e.terrain = std::make_unique<components::Terrain>();
+
                         if (utils::get_random_int(0,100) > 70)
                         {
                                 e.gfx->tile_id = 4;
-                                e.block = std::make_unique<BlockComponent>();
-                                e.block->block = true;
+
+                                e.terrain->is_blocking = true;
                         }
-                        map.set_at(x,y, std::move(e));
+
+                        map(x, y) = std::move(e);
                 }
         }
 
         return map;
 }
 
+void update_blocked(
+        const Array2<Entity>& terrain,
+        Array2<bool>& blocked_ref)
+{
+        for (const auto& e : terrain)
+        {
+                blocked_ref(*e.pos) = e.terrain->is_blocking;
+        }
 }
+
+} // map

@@ -1,6 +1,8 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <vector>
+
 #include "state.hpp"
 #include "entity.hpp"
 #include "geometry.hpp"
@@ -10,9 +12,7 @@ struct Entity;
 class Game : public State
 {
 public:
-        Game() :
-                actors_(),
-                map_() {}
+        Game() {}
 
         ~Game() {}
 
@@ -28,10 +28,9 @@ public:
         std::vector<StateSignal> update(const InputData& input) override;
 
 private:
+        std::vector<Entity> actors_ = {};
 
-        std::vector<Entity> actors_;
-
-        A2<Entity> map_;
+        Array2<Entity> terrain_ = {};
 };
 
 #endif // GAME_HPP

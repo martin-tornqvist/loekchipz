@@ -1,21 +1,21 @@
 #include "floodfill.hpp"
 #include "geometry.hpp"
 
-A2<int> floodfill(
+Array2<int> floodfill(
         const P p0,
         const P* const p1,
-        const A2<bool>& blocked,
+        const Array2<bool>& blocked,
         const int* const travel_limit)
 {
-        A2<int> result(blocked.dims(), flood_value_unreached);
+        Array2<int> result(blocked.dims(), flood_value_unreached);
 
-        result.set_at_p(p0, 0);
+        result.at(p0) = 0;
 
         // Vector of positions to travel to
         // In the worst case we need to visit every position, reserve elements
         // for this to avoid lots of expensive resizing
         std::vector<P> positions;
-        positions.reserve(result.size());
+        positions.reserve(result.nr_elements());
 
         // Instead of removing evaluated positions from the vector, we track
         // which index to try next (cheaper than erasing front elements).
@@ -49,13 +49,13 @@ A2<int> floodfill(
                         }
 
                         // blocked?
-                        if (blocked.copy_from_p(new_p))
+                        if (blocked.at(new_p))
                         {
                                 continue;
                         }
 
                         // Already visited?
-                        if (result.at_p(new_p) != flood_value_unreached)
+                        if (result.at(new_p) != flood_value_unreached)
                         {
                                 continue;
                         }
@@ -66,11 +66,11 @@ A2<int> floodfill(
                                 continue;
                         }
 
-                        v = result.copy_from_p(p);
+                        v = result.at(p);
 
                         if (travel_limit == nullptr || v < *travel_limit)
                         {
-                                result.set_at_p(new_p, v + 1);
+                                result(new_p) = v + 1;
                         }
 
                         // Reached the target?

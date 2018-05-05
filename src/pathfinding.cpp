@@ -1,21 +1,24 @@
 #include "pathfinding.hpp"
 #include "floodfill.hpp"
 
-std::vector<P> pathfind(const P& p0,
-                        const P& p1,
-                        A2<bool>& blocked)
-{
-        auto flood = floodfill(p0,
-                               nullptr,
-                               blocked,
-                               nullptr);
-        return pathfind_with_flood(p0, p1, flood);
-}
-
-std::vector<P> pathfind_with_flood(
+std::vector<P> pathfind(
         const P& p0,
         const P& p1,
-        const A2<int>& flood)
+        const Array2<bool>& blocked)
+{
+        auto flood = floodfill(
+                p0,
+                nullptr,
+                blocked,
+                nullptr);
+
+        return pathfind(p0, p1, flood);
+}
+
+std::vector<P> pathfind(
+        const P& p0,
+        const P& p1,
+        const Array2<int>& flood)
 {
         std::vector<P> path;
 
@@ -25,20 +28,20 @@ std::vector<P> pathfind_with_flood(
                 return path;
         }
 
-        if (flood.copy_from_p(p1) == flood_value_unreached)
+        if (flood.at(p1) == flood_value_unreached)
         {
                 // No path exists
                 return path;
         }
 
         // The path length will be equal to a the flood value at the target cell
-        path.resize(flood.copy_from_p(p1), P(-1, -1));
+        path.resize(flood.at(p1), P(-1, -1));
 
         // We start at the target cell
         auto p = p1;
 
         // Number of steps from p0 to the current position
-        auto current_dist_from_p0 = flood.copy_from_p(p);
+        auto current_dist_from_p0 = flood.at(p);
 
         path[(current_dist_from_p0 - 1)] = p;
 
@@ -56,7 +59,7 @@ std::vector<P> pathfind_with_flood(
                                 continue;
                         }
 
-                        auto adj_v = flood.copy_from_p(adj_p);
+                        auto adj_v = flood.at(adj_p);
 
                         if (adj_v == flood_value_unreached)
                         {
@@ -64,7 +67,7 @@ std::vector<P> pathfind_with_flood(
                                 continue;
                         }
 
-                        auto cur_v = flood.copy_from_p(p);
+                        auto cur_v = flood.at(p);
 
                         if (adj_v >= cur_v)
                         {

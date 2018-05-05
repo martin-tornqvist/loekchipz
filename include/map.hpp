@@ -7,7 +7,11 @@
 namespace map
 {
 
-A2<Entity> generate_map();
+Array2<Entity> generate();
+
+void update_blocked(
+        const Array2<Entity>& terrain,
+        Array2<bool>& blocked_ref);
 
 }
 

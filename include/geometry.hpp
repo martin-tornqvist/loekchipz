@@ -156,14 +156,19 @@ struct P
                 return P(x * v, y * v);
         }
 
-        P scaled_down(const int  v) const
-        {
-                return P(x / v, y / v);
-        }
-
         P scaled_down(const P p) const
         {
                 return P(x / p.x, y / p.y);
+        }
+
+        P scaled_down(const int x_div, const int y_div) const
+        {
+                return P(x / x_div, y / y_div);
+        }
+
+        P scaled_down(const int  v) const
+        {
+                return P(x / v, y / v);
         }
 
         bool operator==(const P p) const
@@ -339,78 +344,287 @@ struct R
 };
 
 // -----------------------------------------------------------------------------
-// A2 - Dynamic 2d array
+// Array2 - Dynamic 2d array
 // -----------------------------------------------------------------------------
-template <class T>
-struct A2
+template<typename T>
+class Array2
 {
 public:
-        A2() :
-                data(),
-                w(0),
-                h(0) {}
+        Array2() :
+                data_(nullptr),
+                dims_(0, 0) {}
 
-        explicit A2(P dims) :
-                data(dims.x * dims.y),
-                w(dims.x),
-                h(dims.y) {}
-
-        A2(P dims, T fill) :
-                data(dims.x * dims.y, fill),
-                w(dims.x),
-                h(dims.y) {}
-
-        T& at(int x, int y)
+        Array2(const P& dims) :
+                data_(nullptr),
+                dims_()
         {
-                return data[w * y + x];
+                resize(dims);
         }
 
-        T& at_p(const P& p)
+        Array2(const P& dims, const T value) :
+                data_(nullptr),
+                dims_()
         {
-                return at(p.x, p.y);
+                resize(dims, value);
         }
 
-        T copy_from(int x, int y) const
+        Array2(const int w, const int h) :
+                data_(nullptr),
+                dims_()
         {
-                return data[w * y + x];
+                resize(P(w, h));
         }
 
-        T copy_from_p(const P& p) const
+        Array2(const int w, const int h, const T value) :
+                data_(nullptr),
+                dims_()
         {
-                return data[w * p.y + p.x];
+                resize(P(w, h), value);
         }
 
-        void set_at(int x, int y, T d)
+        Array2(const Array2<T>& other) :
+                data_(nullptr),
+                dims_()
         {
-                int i = w * y + x;
-                data[i] = std::move(d);
+                resize(other.dims_);
+
+                const size_t size = nr_elements();
+
+                for (size_t idx = 0; idx < size; ++idx)
+                {
+                        data_[idx] = std::move(other.data_[idx]);
+                }
         }
 
-        void set_at_p(const P& p, T d)
+        Array2<T>& operator=(const Array2<T>& other)
         {
-                set_at(p.x, p.y, d);
+                resize(other.dims_);
+
+                const size_t size = nr_elements();
+
+                for (size_t idx = 0; idx < size; ++idx)
+                {
+                        data_[idx] = other.data_[idx];
+                }
+
+                return *this;
         }
 
-        P dims() const
+        Array2<T>& operator=(const Array2<T>&& other)
         {
-                return P(w, h);
+                resize(other.dims_);
+
+                const size_t size = nr_elements();
+
+                for (size_t idx = 0; idx < size; ++idx)
+                {
+                        data_[idx] = std::move(other.data_[idx]);
+                }
+
+                return *this;
         }
 
-        int size() const
+        ~Array2()
         {
-                return w * h;
+                delete[] data_;
+        }
+
+        T* begin() const
+        {
+                return data_;
+        }
+
+        T* end() const
+        {
+                return data_ + nr_elements();
+        }
+
+        void resize(const P& dims)
+        {
+                dims_ = dims;
+
+                const size_t size = nr_elements();
+
+                delete[] data_;
+
+                data_ = new T[size];
+        }
+
+        void resize(const int w, const int h)
+        {
+                resize(P(w, h));
+        }
+
+        void resize(const P& dims, const T value)
+        {
+                resize(dims);
+
+                std::fill_n(data_, nr_elements(), value);
+        }
+
+        void resize(const int w, const int h, const T value)
+        {
+                resize(P(w, h), value);
+        }
+
+        void rotate_cw()
+        {
+                const P my_dims(dims());
+
+                Array2<T> rotated(my_dims.y, my_dims.x);
+
+                for (int x = 0; x < my_dims.x; ++x)
+                {
+                        for (int y = 0; y < my_dims.y; ++y)
+                        {
+                                const size_t my_idx = pos_to_idx(x, y);
+
+                                rotated(my_dims.y - 1 - y, x) = data_[my_idx];
+                        }
+                }
+
+                *this = rotated;
+        }
+
+        void rotate_ccw()
+        {
+                const P my_dims(dims());
+
+                Array2<T> rotated(my_dims.y, my_dims.x);
+
+                for (int x = 0; x < my_dims.x; ++x)
+                {
+                        for (int y = 0; y < my_dims.y; ++y)
+                        {
+                                const size_t my_idx = pos_to_idx(x, y);
+
+                                rotated(y, my_dims.x - 1 - x) = data_[my_idx];
+                        }
+                }
+
+                *this = rotated;
+        }
+
+        void flip_hor()
+        {
+                const P d(dims());
+
+                for (int x = 0; x < d.x / 2; ++x)
+                {
+                        for (int y = 0; y < d.y; ++y)
+                        {
+                                const size_t idx_1 = pos_to_idx(x, y);
+                                const size_t idx_2 = pos_to_idx(d.x - 1 - x, y);
+
+                                std::swap(data_[idx_1], data_[idx_2]);
+                        }
+                }
+        }
+
+        void flip_ver()
+        {
+                const P d(dims());
+
+                for (int x = 0; x < d.x; ++x)
+                {
+                        for (int y = 0; y < d.y / 2; ++y)
+                        {
+                                const size_t idx_1 = pos_to_idx(x, y);
+                                const size_t idx_2 = pos_to_idx(x, d.y - 1 - y);
+
+                                std::swap(data_[idx_1], data_[idx_2]);
+                        }
+                }
+        }
+
+        T& at(const P& p) const
+        {
+                return get_element_ref(p);
+        }
+
+        T& at(const int x, const int y) const
+        {
+                return get_element_ref(P(x, y));
+        }
+
+        T& operator()(const P& p) const
+        {
+                return get_element_ref(p);
+        }
+
+        T& operator()(const int x, const int y) const
+        {
+                return get_element_ref(P(x, y));
+        }
+
+        // void for_each(std::function<void(T& v)> func)
+        // {
+        //         const size_t size = nr_elements();
+
+        //         for (size_t idx = 0; idx < size; ++idx)
+        //         {
+        //                 func(data_[idx]);
+        //         }
+        // }
+
+        void clear()
+        {
+                delete[] data_;
+
+                dims_.set(0, 0);
+        }
+
+        const P& dims() const
+        {
+                return dims_;
+        }
+
+        size_t nr_elements() const
+        {
+                return dims_.x * dims_.y;
         }
 
         bool is_p_inside(const P& p) const
         {
-                const bool x_inside = (p.x >= 0) && (p.x < w);
-                const bool y_inside = (p.y >= 0) && (p.y < h);
+                const bool x_inside = (p.x >= 0) && (p.x < dims_.x);
+                const bool y_inside = (p.y >= 0) && (p.y < dims_.y);
 
                 return x_inside && y_inside;
         }
 
-        std::vector<T> data;
-        int w, h;
+private:
+        T& get_element_ref(const P& p) const
+        {
+                // check_pos(p);
+
+                const size_t idx = pos_to_idx(p);
+
+                return data_[idx];
+        }
+
+        size_t pos_to_idx(const P& p) const
+        {
+                return (p.x * dims_.y) + p.y;
+        }
+
+        size_t pos_to_idx(const int x, const int y) const
+        {
+                return pos_to_idx(P(x, y));
+        }
+
+        // void check_pos(const P& p) const
+        // {
+        //         if ((p.x < 0) ||
+        //             (p.y < 0) ||
+        //             (p.x >= dims_.x) ||
+        //             (p.y >= dims_.y))
+        //         {
+        //                 ASSERT(false);
+        //         }
+        // }
+
+        T* data_;
+        P dims_;
 };
 
 #endif // GEOMETRY_HPP
