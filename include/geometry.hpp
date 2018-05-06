@@ -562,16 +562,6 @@ public:
                 return get_element_ref(P(x, y));
         }
 
-        // void for_each(std::function<void(T& v)> func)
-        // {
-        //         const size_t size = nr_elements();
-
-        //         for (size_t idx = 0; idx < size; ++idx)
-        //         {
-        //                 func(data_[idx]);
-        //         }
-        // }
-
         void clear()
         {
                 delete[] data_;
@@ -617,6 +607,7 @@ private:
                 return pos_to_idx(P(x, y));
         }
 
+        // TODO: Reimplement when we have some sort of 'ASSERT'
         // void check_pos(const P& p) const
         // {
         //         if ((p.x < 0) ||
