@@ -33,6 +33,13 @@ struct Movable
         bool is_moving = false;
 };
 
+struct Markable
+{
+        void draw_mark(const P& pos);
+
+        bool is_marked = false;
+};
+
 } // components
 
 #endif // COMPONENT_HPP

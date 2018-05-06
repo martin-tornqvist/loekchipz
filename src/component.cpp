@@ -38,4 +38,15 @@ P Movable::step()
         return next_pos;
 }
 
+void Markable::draw_mark(const P& pos)
+{
+        P px_pos;
+
+        px_pos = pos.scaled_up(32, 32);
+
+        const R px_rect(px_pos, px_pos.with_offsets(32, 32));
+
+        io::draw_rect_solid(px_rect, {0, 0, 192});
 }
+
+} // components

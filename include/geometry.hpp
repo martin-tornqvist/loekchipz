@@ -131,6 +131,11 @@ struct P
                 return P(x - v, y - v);
         }
 
+        P with_offsets(const int x_offset, const int y_offset)
+        {
+                return P(x + x_offset, y + y_offset);
+        }
+
         P with_x_offset(const int offset) const
         {
                 return P(x + offset, y);

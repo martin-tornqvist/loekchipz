@@ -234,8 +234,8 @@ void draw_text(
 
         SDL_Rect sdl_rect;
 
-        sdl_rect.x = pos.value.x + (rect.p1.x - rect.p0.x)/2 - srf->w/2;
-        sdl_rect.y = pos.value.y + (rect.p1.y - rect.p0.y)/2 - srf->h/2;
+        sdl_rect.x = pos.value.x + (rect.p1.x - rect.p0.x) / 2 - srf->w / 2;
+        sdl_rect.y = pos.value.y + (rect.p1.y - rect.p0.y) / 2 - srf->h / 2;
 
         sdl_rect.w = srf->w;
         sdl_rect.h = srf->h;
@@ -264,32 +264,73 @@ void draw_tile(
         src.x = 32 * id;
 
         SDL_Rect dest;
+
         dest.x = pos.value.x;
         dest.y = pos.value.y;
         dest.w = src.w;
         dest.h = src.h;
 
-        SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 255);
-        //SDL_RenderFillRect(renderer_, &dest); // Todo: should we fill in the bg? neh?
-        SDL_RenderCopy(renderer_, tiles_, &src, &dest);
+        SDL_SetRenderDrawColor(
+                renderer_,
+                color.r,
+                color.g,
+                color.b,
+                255);
 
+        // TODO: should we fill in the bg? neh?
+        // SDL_RenderFillRect(renderer_, &dest);
+
+        SDL_RenderCopy(renderer_, tiles_, &src, &dest);
 }
 
 void draw_rect(const R& rect, const Color& color)
 {
         SDL_Rect r;
+
         r.x = rect.p0.x;
         r.y = rect.p0.y;
         r.w = rect.p1.x - rect.p0.x;
         r.h = rect.p1.y - rect.p0.y;
-        SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 255);
+
+        SDL_SetRenderDrawColor(
+                renderer_,
+                color.r,
+                color.g,
+                color.b,
+                255);
+
         SDL_RenderDrawRect(renderer_, &r);
+}
+
+void draw_rect_solid(const R& rect, const Color& color)
+{
+        SDL_Rect r;
+
+        r.x = rect.p0.x;
+        r.y = rect.p0.y;
+        r.w = rect.p1.x - rect.p0.x;
+        r.h = rect.p1.y - rect.p0.y;
+
+        SDL_SetRenderDrawColor(
+                renderer_,
+                color.r,
+                color.g,
+                color.b,
+                255);
+
+        SDL_RenderFillRect(renderer_, &r);
 }
 
 void draw_line(const PxPos& p0, const PxPos& p1)
 {
         SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
-        SDL_RenderDrawLine(renderer_, p0.value.x, p0.value.y, p1.value.x, p1.value.y);
+
+        SDL_RenderDrawLine(
+                renderer_,
+                p0.value.x,
+                p0.value.y,
+                p1.value.x,
+                p1.value.y);
 }
 
 void clear_screen()

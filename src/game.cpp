@@ -46,14 +46,22 @@ static void draw_path(std::vector<P> path, const P& origin)
 
 static void draw_entity(const Entity& e)
 {
+        if (e.markable && e.markable->is_marked)
+        {
+                e.markable->draw_mark(*e.pos);
+        }
+
+        if (e.movable && !e.movable->path.empty())
+        {
+                draw_path(e.movable->path, *e.pos);
+        }
+
         e.gfx->draw(*e.pos);
 }
 
 static void step_movable(Entity& entity)
 {
-        if (entity.pos &&
-            entity.movable &&
-            entity.movable->is_moving)
+        if (entity.movable->is_moving)
         {
                 entity.pos->set(entity.movable->step());
         }
@@ -63,8 +71,69 @@ static void step_all_movables(std::vector<Entity>& entities)
 {
         for (auto& e : entities)
         {
-                step_movable(e);
+                if (e.pos && e.movable)
+                {
+                        step_movable(e);
+                }
         }
+}
+
+static void unmark_all_entities(std::vector<Entity>& entities)
+{
+        for (auto& e : entities)
+        {
+                if (e.markable)
+                {
+                        e.markable->is_marked = false;
+                }
+        }
+}
+
+static void mark_entities_at(std::vector<Entity>& entities, const P& pos)
+{
+        for (auto& e : entities)
+        {
+                if (!e.markable)
+                {
+                        continue;
+                }
+
+                if (e.pos && *e.pos == pos)
+                {
+                        e.markable->is_marked = true;
+                }
+        }
+}
+
+static void update_movable_for_player_move_order(
+        components::Movable& movable,
+        const P& pos,
+        const P& target,
+        const Array2<bool>& blocked)
+{
+        movable.is_moving = false;
+
+        const auto old_path = movable.path;
+
+        movable.path = pathfind(pos, target, blocked);
+
+        if (movable.path != old_path)
+        {
+                // We have a new path, which must be confirmed
+                // by the player - stop moving
+                movable.is_moving = false;
+
+                return;
+        }
+
+        if (movable.path.empty())
+        {
+                return;
+        }
+
+        // OK, we have a confirmed, non-empty path
+
+        movable.is_moving = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -85,6 +154,8 @@ std::vector<StateSignal> Game::on_start()
                 entity.gfx->color = {255, 255, 255};
 
                 entity.movable = std::make_unique<components::Movable>();
+
+                entity.markable = std::make_unique<components::Markable>();
 
                 actors_.push_back(std::move(entity));
         }
@@ -117,11 +188,6 @@ void Game::draw()
         for (auto& e : actors_)
         {
                 draw_entity(e);
-
-                if (e.movable && !e.movable->path.empty())
-                {
-                        draw_path(e.movable->path, *e.pos);
-                }
         }
 }
 
@@ -131,32 +197,36 @@ std::vector<StateSignal> Game::update(const InputData& input)
 
         map::update_blocked(terrain_, blocked);
 
+        // TODO: use constants for TILE_SIZE
+        // TODO: We need to do something about coordinates! This is stupid.
+
         if (input.mouse_left_pressed)
         {
-                // TODO: use constants for TILE_SIZE
-                // TODO: Actor access is temporary.
-                // TODO: We need to do something about coordinates! This is stupid.
+                unmark_all_entities(actors_);
 
-                auto& actor = actors_[0];
+                const P selected_map_pos =
+                        input.mouse_pos.value.scaled_down(32, 32);
 
-                if (actor.movable)
+                mark_entities_at(actors_, selected_map_pos);
+        }
+
+        if (input.mouse_right_pressed)
+        {
+                const P selected_map_pos =
+                        input.mouse_pos.value.scaled_down(32, 32);
+
+                for (auto& actor : actors_)
                 {
-                        const P selected_map_pos =
-                                input.mouse_pos.value.scaled_down(32, 32);
-
-                        if (!actor.movable->path.empty())
+                        if (actor.movable &&
+                            actor.markable &&
+                            actor.markable->is_marked)
                         {
-                                const P target_before =
-                                        actor.movable->path.back();
-
-                                if (selected_map_pos == target_before)
-                                {
-                                        actor.movable->is_moving = true;
-                                }
+                                update_movable_for_player_move_order(
+                                        *actor.movable,
+                                        *actor.pos,
+                                        selected_map_pos,
+                                        blocked);
                         }
-
-                        actor.movable->path =
-                                pathfind(*actor.pos, selected_map_pos, blocked);
                 }
         }
 

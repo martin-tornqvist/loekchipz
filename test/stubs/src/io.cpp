@@ -53,6 +53,14 @@ void draw_rect(
         (void)color;
 }
 
+void draw_rect_solid(
+        const R& rect,
+        const Color& color)
+{
+        (void)rect;
+        (void)color;
+}
+
 void draw_line(
         const PxPos& p0,
         const PxPos& p1)

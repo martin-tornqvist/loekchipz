@@ -53,6 +53,8 @@ void draw_tile(
 
 void draw_rect(const R& rect, const Color& color);
 
+void draw_rect_solid(const R& rect, const Color& color);
+
 void draw_line(const PxPos& p0, const PxPos& p1);
 
 void clear_screen();
