@@ -1,10 +1,13 @@
 #include "io.hpp"
 #include "state.hpp"
 #include "main_menu.hpp"
+#include "random.hpp"
 
 int main()
 {
         io::init();
+
+        rnd::seed();
 
         States states;
 

@@ -40,6 +40,12 @@ struct Markable
         bool is_marked = false;
 };
 
+struct Army
+{
+        // Just something as dumb as possible for now
+        int nr_soldiers = 0;
+};
+
 } // components
 
 #endif // COMPONENT_HPP

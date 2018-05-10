@@ -1,6 +1,6 @@
 #include "map.hpp"
 #include <memory>
-#include "utils.hpp"
+#include "random.hpp"
 
 // -----------------------------------------------------------------------------
 // Private
@@ -36,7 +36,7 @@ Array2<Entity> generate()
 
                         e.terrain = std::make_unique<components::Terrain>();
 
-                        if (utils::get_random_int(0,100) > 70)
+                        if (rnd::one_in(6))
                         {
                                 e.gfx->tile_id = 4;
 

@@ -4,10 +4,14 @@
 #include "map.hpp"
 #include "pathfinding.hpp"
 #include "component.hpp"
+#include "random.hpp"
 
 // -----------------------------------------------------------------------------
 // Private
 // -----------------------------------------------------------------------------
+
+// TODO: (Most of) these functions should be moved to other files eventually
+
 static void draw_path(std::vector<P> path, const P& origin)
 {
         for (size_t i = 0; i < path.size(); ++i)
@@ -136,6 +140,55 @@ static void update_movable_for_player_move_order(
         movable.is_moving = true;
 }
 
+static void run_combats(std::vector<Entity>& entities)
+{
+        for (size_t idx_1 = 0; idx_1 < entities.size(); ++idx_1)
+        {
+                for (size_t idx_2 = idx_1 + 1; idx_2 < entities.size(); ++idx_2)
+                {
+                        auto& e1 = entities[idx_1];
+                        auto& e2 = entities[idx_2];
+
+                        if (!e1.army ||
+                            !e2.army ||
+                            !e1.pos ||
+                            !e2.pos ||
+                            (*e1.pos != *e2.pos))
+                        {
+                                continue;
+                        }
+
+                        // These are two armies at the same position
+
+                        // Completely random choice - don't even care about army
+                        // size for now, and the winner does not lose soldiers
+                        auto& loser =
+                                rnd::coin_toss()
+                                ? e1
+                                : e2;
+
+                        loser.army.reset();
+
+                        loser.discard = true;
+                }
+        }
+}
+
+static void remove_entities_marked_for_discarding(std::vector<Entity>& entities)
+{
+        for (auto it = begin(entities); it != end(entities); )
+        {
+                if (it->discard)
+                {
+                        entities.erase(it);
+                }
+                else
+                {
+                        ++it;
+                }
+        }
+}
+
 // -----------------------------------------------------------------------------
 // Game
 // -----------------------------------------------------------------------------
@@ -157,6 +210,9 @@ std::vector<StateSignal> Game::on_start()
 
                 entity.markable = std::make_unique<components::Markable>();
 
+                entity.army = std::make_unique<components::Army>();
+                entity.army->nr_soldiers = 1000;
+
                 actors_.push_back(std::move(entity));
         }
 
@@ -169,6 +225,9 @@ std::vector<StateSignal> Game::on_start()
                 entity.gfx = std::make_unique<components::Gfx>();
                 entity.gfx->tile_id = 2;
                 entity.gfx->color = {255, 255, 255};
+
+                entity.army = std::make_unique<components::Army>();
+                entity.army->nr_soldiers = 1000;
 
                 actors_.push_back(std::move(entity));
         }
@@ -231,6 +290,10 @@ std::vector<StateSignal> Game::update(const InputData& input)
         }
 
         step_all_movables(actors_);
+
+        run_combats(actors_);
+
+        remove_entities_marked_for_discarding(actors_);
 
         if (input.c == 'q')
         {

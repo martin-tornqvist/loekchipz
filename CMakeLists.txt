@@ -20,8 +20,8 @@ set(COMMON_SRC
   include/main_menu.hpp
   include/map.hpp
   include/pathfinding.hpp
+  include/random.hpp
   include/state.hpp
-  include/utils.hpp
 
   src/component.cpp
   src/floodfill.cpp
@@ -31,8 +31,8 @@ set(COMMON_SRC
   src/main_menu.cpp
   src/map.cpp
   src/pathfinding.cpp
+  src/random.cpp
   src/state.cpp
-  src/utils.cpp
   )
 
 set(GAME_SRC
