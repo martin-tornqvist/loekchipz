@@ -19,6 +19,7 @@ set(COMMON_SRC
   include/io.hpp
   include/main_menu.hpp
   include/map.hpp
+  include/noise.hpp
   include/pathfinding.hpp
   include/random.hpp
   include/state.hpp

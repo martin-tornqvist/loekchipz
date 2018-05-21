@@ -1,6 +1,10 @@
 #include "map.hpp"
 #include <memory>
 #include "random.hpp"
+#include "noise.hpp"
+
+#include <vector>
+#include <iostream>
 
 // -----------------------------------------------------------------------------
 // Private
@@ -16,12 +20,18 @@ namespace map
 
 Array2<Entity> generate()
 {
+
+        PerlinNoise pn(9023321);
         Array2<Entity> map(P(map_w, map_h));
 
         for(int x = 0; x < map_w; ++x)
         {
                 for(int y = 0; y < map_h; ++y)
                 {
+
+                        double n = 5*pn.noise((double)x/(double)map_w,(double)y/(double)map_h);
+                        n = n-floor(n);
+                        std::cout << n << std::endl;
                         Entity e;
 
                         e.pos = std::make_unique<P>();
@@ -30,22 +40,41 @@ Array2<Entity> generate()
 
                         e.gfx = std::make_unique<components::Gfx>();
 
-                        e.gfx->tile_id = 1;
+                        if (n >= 0 && n <= 0.3)
+                        {
+                                e.gfx->tile_id = 5;
+                        }
+                        else if (n > 0.3 && n <= 0.4)
+                        {
+                                e.gfx->tile_id = 4;
+                        }
+                        else if (n > 0.9)
+                        {
+                                 e.gfx->tile_id = 4;
+                        }
+                        else
+                        {
+                                e.gfx->tile_id = 1;
+                        }
 
                         e.gfx->color = {255, 255, 255};
 
                         e.terrain = std::make_unique<components::Terrain>();
+/*
+  if (rnd::one_in(6))
+  {
+  e.gfx->tile_id = 4;
 
-                        if (rnd::one_in(6))
-                        {
-                                e.gfx->tile_id = 4;
-
-                                e.terrain->is_blocking = true;
-                        }
-
+  e.terrain->is_blocking = true;
+  }
+*/
                         map(x, y) = std::move(e);
                 }
         }
+
+
+
+
 
         return map;
 }
