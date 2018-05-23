@@ -10,6 +10,7 @@ project(lc)
 # Source files
 # ------------------------------------------------------------------------------
 set(COMMON_SRC
+  include/combat.hpp
   include/component.hpp
   include/entity.hpp
   include/floodfill.hpp
@@ -23,7 +24,9 @@ set(COMMON_SRC
   include/pathfinding.hpp
   include/random.hpp
   include/state.hpp
+  include/unit.hpp
 
+  src/combat.cpp
   src/component.cpp
   src/floodfill.cpp
   src/game.cpp
@@ -69,9 +72,6 @@ add_executable(lc-test  ${TEST_SRC})
 set_target_properties(lc        PROPERTIES OUTPUT_NAME lc)
 set_target_properties(lc-debug  PROPERTIES OUTPUT_NAME lc-debug)
 
-# TODO: Enable this flag:
-# -Wfloat-conversion
-
 # GNU gcc and Clang specific compiler flags
 if(CMAKE_COMPILER_IS_GNUCXX OR(CMAKE_C_COMPILER_ID MATCHES "Clang") OR(CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
 
@@ -83,6 +83,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR(CMAKE_C_COMPILER_ID MATCHES "Clang") OR(CMAKE_CXX
     -Wextra
     -Werror
     -Weffc++
+    -Wfloat-conversion
     )
 
   set(DEBUG_COMPILE_FLAGS

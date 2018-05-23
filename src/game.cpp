@@ -1,9 +1,10 @@
 #include "game.hpp"
 
+#include "combat.hpp"
+#include "component.hpp"
 #include "io.hpp"
 #include "map.hpp"
 #include "pathfinding.hpp"
-#include "component.hpp"
 #include "random.hpp"
 
 // -----------------------------------------------------------------------------
@@ -149,6 +150,15 @@ static void run_combats(std::vector<Entity>& entities)
                         auto& e1 = entities[idx_1];
                         auto& e2 = entities[idx_2];
 
+                        // TODO: Also check if they are enemies
+
+                        // TODO: If additional armies are here, which are
+                        // hostile to both army 1 and 2, they should wait until
+                        // army 1 and 2 are completely finished (one of the
+                        // armies is killed or has fled), then fight the
+                        // winner. There should never be multiple combats going
+                        // on at the same position.
+
                         if (!e1.army ||
                             !e2.army ||
                             !e1.pos ||
@@ -160,16 +170,51 @@ static void run_combats(std::vector<Entity>& entities)
 
                         // These are two armies at the same position
 
-                        // Completely random choice - don't even care about army
-                        // size for now, and the winner does not lose soldiers
-                        auto& loser =
-                                rnd::coin_toss()
-                                ? e1
-                                : e2;
+                        combat::run_combat(
+                                e1.army->units,
+                                e2.army->units);
 
-                        loser.army.reset();
+                        // TODO: Some duplicated code here, fix
+                        for (auto it = begin(e1.army->units);
+                             it != end(e1.army->units); )
+                        {
+                                if (it->strength <= 0)
+                                {
+                                        it = e1.army->units.erase(it);
+                                }
+                                else
+                                {
+                                        ++it;
+                                }
+                        }
 
-                        loser.discard = true;
+                        for (auto it = begin(e2.army->units);
+                             it != end(e2.army->units); )
+                        {
+                                if (it->strength <= 0)
+                                {
+                                        it = e2.army->units.erase(it);
+                                }
+                                else
+                                {
+                                        ++it;
+                                }
+                        }
+
+                        if (e1.army->units.empty())
+                        {
+                                e1.army.reset();
+
+                                e1.discard = true;
+                        }
+
+                        if (e2.army->units.empty())
+                        {
+                                e2.army.reset();
+
+                                e2.discard = true;
+                        }
+
                 }
         }
 }
@@ -211,7 +256,8 @@ std::vector<StateSignal> Game::on_start()
                 entity.markable = std::make_unique<components::Markable>();
 
                 entity.army = std::make_unique<components::Army>();
-                entity.army->nr_soldiers = 1000;
+
+                entity.army->units.assign(1000, {"foo", 10});
 
                 actors_.push_back(std::move(entity));
         }
@@ -227,7 +273,8 @@ std::vector<StateSignal> Game::on_start()
                 entity.gfx->color = {255, 255, 255};
 
                 entity.army = std::make_unique<components::Army>();
-                entity.army->nr_soldiers = 1000;
+
+                entity.army->units.assign(1000, {"foo", 10});
 
                 actors_.push_back(std::move(entity));
         }
@@ -291,14 +338,19 @@ std::vector<StateSignal> Game::update(const InputData& input)
 
         step_all_movables(actors_);
 
-        run_combats(actors_);
-
-        remove_entities_marked_for_discarding(actors_);
-
         if (input.c == 'q')
         {
                 return {StateSignal().set_pop()};
         }
+
+        // TODO: We don't have any game turn handling yet, so for now we just
+        // press "t" to execute a combat for all meeting armies
+        if (input.c == 't')
+        {
+                run_combats(actors_);
+        }
+
+        remove_entities_marked_for_discarding(actors_);
 
         return {};
 }
