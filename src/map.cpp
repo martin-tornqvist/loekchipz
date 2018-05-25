@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <iostream>
+#include "random.hpp"
 
 // -----------------------------------------------------------------------------
 // Private
@@ -21,7 +22,7 @@ namespace map
 Array2<Entity> generate()
 {
 
-        PerlinNoise pn(9023321);
+        PerlinNoise pn(rnd::range(0, 100000));
         Array2<Entity> map(P(map_w, map_h));
 
         for(int x = 0; x < map_w; ++x)
@@ -29,7 +30,10 @@ Array2<Entity> generate()
                 for(int y = 0; y < map_h; ++y)
                 {
 
-                        double n = 5*pn.noise((double)x/(double)map_w,(double)y/(double)map_h);
+                        double dx = (double)x/(double)map_w;
+                        double dy = (double)y/(double)map_h;
+
+                        double n = 2*pn.noise(dx*3, dy*3);
                         n = n-floor(n);
                         std::cout << n << std::endl;
                         Entity e;
@@ -40,15 +44,15 @@ Array2<Entity> generate()
 
                         e.gfx = std::make_unique<components::Gfx>();
 
-                        if (n >= 0 && n <= 0.3)
+                        if (n < 0.15)
                         {
                                 e.gfx->tile_id = 5;
                         }
-                        else if (n > 0.3 && n <= 0.4)
+                        else if (n >= 0.15 && n <= 0.75)
                         {
-                                e.gfx->tile_id = 4;
+                                e.gfx->tile_id = 1;
                         }
-                        else if (n > 0.9)
+                        else if (n >= 0.75 && n < 0.8)
                         {
                                  e.gfx->tile_id = 4;
                         }
