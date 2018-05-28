@@ -30,7 +30,7 @@ public:
 private:
         std::vector<Entity> actors_ = {};
 
-        Array2<Entity> terrain_ = {};
+        Array2<Entity> terrain_ = {0, 0};
 };
 
 #endif // GAME_HPP

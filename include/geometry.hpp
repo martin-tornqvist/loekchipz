@@ -355,10 +355,6 @@ template<typename T>
 class Array2
 {
 public:
-        Array2() :
-                data_(nullptr),
-                dims_(0, 0) {}
-
         Array2(const P& dims) :
                 data_(nullptr),
                 dims_()
@@ -391,47 +387,65 @@ public:
                 data_(nullptr),
                 dims_()
         {
-                resize(other.dims_);
+                resize_no_init(other.dims_);
 
-                const size_t size = nr_elements();
-
-                for (size_t idx = 0; idx < size; ++idx)
-                {
-                        data_[idx] = std::move(other.data_[idx]);
-                }
+                std::copy(
+                        std::begin(other),
+                        std::end(other),
+                        std::begin(*this));
         }
 
-        Array2<T>& operator=(const Array2<T>& other)
+        Array2(Array2<T>&& other) :
+                data_(other.data_),
+                dims_(other.dims_)
         {
-                resize(other.dims_);
-
-                const size_t size = nr_elements();
-
-                for (size_t idx = 0; idx < size; ++idx)
-                {
-                        data_[idx] = other.data_[idx];
-                }
-
-                return *this;
-        }
-
-        Array2<T>& operator=(const Array2<T>&& other)
-        {
-                resize(other.dims_);
-
-                const size_t size = nr_elements();
-
-                for (size_t idx = 0; idx < size; ++idx)
-                {
-                        data_[idx] = std::move(other.data_[idx]);
-                }
-
-                return *this;
+                other.data_ = nullptr;
+                other.dims_ = {0, 0};
         }
 
         ~Array2()
         {
                 delete[] data_;
+        }
+
+        Array2<T>& operator=(const Array2<T>& other)
+        {
+                resize_no_init(other.dims_);
+
+                std::copy(
+                        std::begin(other),
+                        std::end(other),
+                        std::begin(*this));
+
+                return *this;
+        }
+
+        Array2<T>& operator=(Array2<T>&& other)
+        {
+                delete[] data_;
+
+                data_ = other.data_;
+                dims_ = other.dims_;
+
+                other.data_ = nullptr;
+                other.dims_ = {0, 0};
+
+                return *this;
+        }
+
+        T& at(const P& p) const
+        {
+                return get_element_ref(p);
+        }
+
+        T& at(const int x, const int y) const
+        {
+                return get_element_ref(P(x, y));
+        }
+
+        T& at(const size_t idx) const
+        {
+                return data_[idx];
         }
 
         T* begin() const
@@ -441,18 +455,23 @@ public:
 
         T* end() const
         {
-                return data_ + nr_elements();
+                return data_ + length();
         }
 
         void resize(const P& dims)
         {
                 dims_ = dims;
 
-                const size_t size = nr_elements();
+                const size_t len = length();
 
                 delete[] data_;
 
-                data_ = new T[size];
+                data_ = nullptr;
+
+                if (len > 0)
+                {
+                        data_ = new T[len]();
+                }
         }
 
         void resize(const int w, const int h)
@@ -462,9 +481,9 @@ public:
 
         void resize(const P& dims, const T value)
         {
-                resize(dims);
+                resize_no_init(dims);
 
-                std::fill_n(data_, nr_elements(), value);
+                std::fill_n(data_, length(), value);
         }
 
         void resize(const int w, const int h, const T value)
@@ -542,26 +561,6 @@ public:
                 }
         }
 
-        T& at(const P& p) const
-        {
-                return get_element_ref(p);
-        }
-
-        T& at(const int x, const int y) const
-        {
-                return get_element_ref(P(x, y));
-        }
-
-        T& operator()(const P& p) const
-        {
-                return get_element_ref(p);
-        }
-
-        T& operator()(const int x, const int y) const
-        {
-                return get_element_ref(P(x, y));
-        }
-
         void clear()
         {
                 delete[] data_;
@@ -569,14 +568,24 @@ public:
                 dims_.set(0, 0);
         }
 
+        size_t length() const
+        {
+                return dims_.x * dims_.y;
+        }
+
         const P& dims() const
         {
                 return dims_;
         }
 
-        size_t nr_elements() const
+        int w() const
         {
-                return dims_.x * dims_.y;
+                return dims_.x;
+        }
+
+        int h() const
+        {
+                return dims_.y;
         }
 
         bool is_p_inside(const P& p) const
@@ -588,6 +597,22 @@ public:
         }
 
 private:
+        void resize_no_init(const P& dims)
+        {
+                dims_ = dims;
+
+                const size_t len = length();
+
+                delete[] data_;
+
+                data_ = nullptr;
+
+                if (len > 0)
+                {
+                        data_ = new T[len];
+                }
+        }
+
         T& get_element_ref(const P& p) const
         {
                 // check_pos(p);

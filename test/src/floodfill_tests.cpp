@@ -17,9 +17,9 @@ static void test_floodfill_blocking()
 
         Array2<bool> blocked(dims);
 
-        blocked(51, 74) = true;
-        blocked(51, 75) = true;
-        blocked(51, 76) = true;
+        blocked.at(51, 74) = true;
+        blocked.at(51, 75) = true;
+        blocked.at(51, 76) = true;
 
         auto flood = floodfill(p0, nullptr, blocked, nullptr);
 
@@ -39,15 +39,15 @@ static void test_floodfill_blocking()
         // 2 2 2 2 4 4 5
 
         // Starting position:
-        assert(flood(p0) == 0);
+        assert(flood.at(p0) == 0);
 
         // Blocked;
-        assert(flood(51, 75) == flood_value_unreached);
+        assert(flood.at(51, 75) == flood_value_unreached);
 
         // Around a blocked area:
-        assert(flood(52, 75) == 4);
-        assert(flood(53, 75) == 4);
-        assert(flood(54, 75) == 5);
+        assert(flood.at(52, 75) == 4);
+        assert(flood.at(53, 75) == 4);
+        assert(flood.at(54, 75) == 5);
 }
 
 static void test_floodfill_no_path()
@@ -62,13 +62,13 @@ static void test_floodfill_no_path()
 
         Array2<bool> blocked(dims);
 
-        blocked(0, 1) = true;
-        blocked(1, 1) = true;
-        blocked(1, 0) = true;
+        blocked.at(0, 1) = true;
+        blocked.at(1, 1) = true;
+        blocked.at(1, 0) = true;
 
         auto flood = floodfill(p0, &p1, blocked, nullptr);
 
-        assert(flood(15, 10) == -1);
+        assert(flood.at(15, 10) == -1);
 
 }
 
@@ -88,7 +88,7 @@ static void test_floodfill_travel_lmt_too_low()
 
         auto flood = floodfill(p0, &p1, blocked, &limit);
 
-        assert(flood(15, 10) == -1);
+        assert(flood.at(15, 10) == -1);
 }
 
 // -----------------------------------------------------------------------------

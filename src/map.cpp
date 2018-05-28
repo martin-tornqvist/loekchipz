@@ -21,8 +21,8 @@ namespace map
 
 Array2<Entity> generate()
 {
-
         PerlinNoise pn(rnd::range(0, 100000));
+
         Array2<Entity> map(P(map_w, map_h));
 
         for(int x = 0; x < map_w; ++x)
@@ -33,9 +33,12 @@ Array2<Entity> generate()
                         double dx = (double)x/(double)map_w;
                         double dy = (double)y/(double)map_h;
 
-                        double n = 2*pn.noise(dx*3, dy*3);
-                        n = n-floor(n);
+                        double n = 2 * pn.noise(dx * 3, dy * 3);
+
+                        n = n - floor(n);
+
                         std::cout << n << std::endl;
+
                         Entity e;
 
                         e.pos = std::make_unique<P>();
@@ -72,13 +75,9 @@ Array2<Entity> generate()
   e.terrain->is_blocking = true;
   }
 */
-                        map(x, y) = std::move(e);
+                        map.at(x, y) = std::move(e);
                 }
         }
-
-
-
-
 
         return map;
 }
@@ -89,7 +88,7 @@ void update_blocked(
 {
         for (const auto& e : terrain)
         {
-                blocked_ref(*e.pos) = e.terrain->is_blocking;
+                blocked_ref.at(*e.pos) = e.terrain->is_blocking;
         }
 }
 

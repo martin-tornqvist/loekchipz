@@ -17,10 +17,10 @@ static void test_pathfinding()
 
         Array2<bool> blocked(dims);
 
-        blocked(51, 74) = true;
-        blocked(51, 75) = true;
-        blocked(51, 76) = true;
-        blocked(51, 77) = true;
+        blocked.at(51, 74) = true;
+        blocked.at(51, 75) = true;
+        blocked.at(51, 76) = true;
+        blocked.at(51, 77) = true;
 
         // Expected flood values, where:
         //

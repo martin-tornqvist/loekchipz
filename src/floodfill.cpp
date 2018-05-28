@@ -15,7 +15,7 @@ Array2<int> floodfill(
         // In the worst case we need to visit every position, reserve elements
         // for this to avoid lots of expensive resizing
         std::vector<P> positions;
-        positions.reserve(result.nr_elements());
+        positions.reserve(result.length());
 
         // Instead of removing evaluated positions from the vector, we track
         // which index to try next (cheaper than erasing front elements).
@@ -70,7 +70,7 @@ Array2<int> floodfill(
 
                         if (travel_limit == nullptr || v < *travel_limit)
                         {
-                                result(new_p) = v + 1;
+                                result.at(new_p) = v + 1;
                         }
 
                         // Reached the target?
